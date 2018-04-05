@@ -1,36 +1,71 @@
-{"Videos":
+{
+  "Videos":
   [
     {
-      "url":"urlHere",
+      "url":"https://www.youtube.com/watch?v=t2b8UdqmlFs",
       "label":"true",
       "exercise":"squat",
       "sex":"male",
-      "view":"side",
+      "view":"left",
       "parts":[
         {
           "name":"start",
-          "startTime":"1:10",
-          "endTime":"2:05"
+          "startTime":"14:34",
+          "endTime":"14:36"
         },
         {
           "name":"down",
-          "startTime":"1:10",
-          "endTime":"2:05"
+          "startTime":"14:38",
+          "endTime":"14:40"
         },
         {
           "name":"bottom",
-          "startTime":"1:10",
-          "endTime":"2:05"
+          "startTime":"14:40",
+          "endTime":"14:44"
         },
         {
           "name":"up",
-          "startTime":"1:10",
-          "endTime":"2:05"
+          "startTime":"14:44",
+          "endTime":"14:46"
         },
         {
           "name":"end",
-          "startTime":"1:10",
-          "endTime":"2:05"
+          "startTime":"14:47",
+          "endTime":"14:49"
+        }
+      ]
+    },
+    {
+      "url":"https://www.youtube.com/watch?v=t2b8UdqmlFs",
+      "label":"true",
+      "exercise":"squat",
+      "sex":"male",
+      "view":"left",
+      "parts":[
+        {
+          "name":"start",
+          "startTime":"14:34",
+          "endTime":"14:36"
+        },
+        {
+          "name":"down",
+          "startTime":"14:38",
+          "endTime":"14:40"
+        },
+        {
+          "name":"bottom",
+          "startTime":"14:40",
+          "endTime":"14:44"
+        },
+        {
+          "name":"up",
+          "startTime":"14:44",
+          "endTime":"14:46"
+        },
+        {
+          "name":"end",
+          "startTime":"14:47",
+          "endTime":"14:49"
         }
       ]
     }

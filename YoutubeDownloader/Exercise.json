@@ -1,0 +1,9 @@
+{"Exercises":
+  [
+    {
+      "name":"squat",
+      "view":"front",
+      "parts":["start","down","botton","up","end"]
+    }
+  ]
+}

@@ -10,13 +10,12 @@ def downloadVideo(url, name):
     '''
     print("downloading %s from %s"%(name, url))
 
-def bulkDownloadVideos():
+def bulkDownloadVideos(videos):
     '''
     :param videos: The array of videos to download
     :return:
     '''
     # Read the json videos file
-    videos = json.load(open(os.getcwd()+'\YoutubeDownloader\YoutubeVideos.json'))['Videos']
     print("Videos count: %d" % (len(videos)))
     for video in videos:
         url = video['url']

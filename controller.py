@@ -1,8 +1,12 @@
 from YoutubeDownloader.YoutubeDownloader import bulkDownloadVideos
+import json
+import os
 
 #Does everything
 
 #Download the videos
-bulkDownloadVideos()
+videos = json.load(open(os.getcwd() + '\data\YoutubeVideos.json'))['Videos']
+
+bulkDownloadVideos(videos)
 
 #Split the videos into frames

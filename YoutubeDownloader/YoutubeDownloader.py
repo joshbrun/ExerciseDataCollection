@@ -23,8 +23,16 @@ def bulkDownloadVideos(videos):
         exercise = video['exercise']
         sex = video['sex']
         view = video['view']
-        filename = "%s_%s_%s_%s.mp4" % (label, exercise, sex, view)
+        filename = "%s_%s_%s_%s.mp4" % (exercise, sex, view, label)
         downloadVideo(url, filename)
+
+        #Split the downloaded file into the required parts using something like
+
+        #ffmpeg - ss(starttime) -t(duration) -c: v copy - c: a copy(title.mp4)
+        #Could be done somewhere else 
+        #So we can extract the frames directly from the part clips,
+        #Instead of having to extract all the frames then approximating the frames from time and frames count
+
 
 
 

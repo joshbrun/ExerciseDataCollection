@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <style>
+  iframe{
+    float: left;
+  }
+  #controls{
+    width:30%;
+    float: left;
+  }
+  #controls * {
+    padding: 3px;
+  }
+  #controls div{
+    width:100%;
+    padding: 1%;
+    text-align: center;
+  }
+  #controls input, #controls select{
+    width: 50%;
+    display: inline-block;
+  }
+  #controls label{
+    width: 20%;
+    display: inline-block;
+    text-align: right;
+  }
+  #controls .btnContainer{
+    width: 20%;
+    margin: 0;
+    display: inline-block;
+  }
+  .btnContainer button{
+    width: 100%;
+  }
+  #controls #record {
+    width: 50%;
+  }
+  </style>
+  <body>
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <div id="player"></div>
+    <script>
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady(id='dQw4w9WgXcQ') {
+        console.log(id);
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: id,
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+      }
+      function stopVideo() {
+        player.stopVideo();
+      }
+      function switchVideo() {
+        player.loadVideoById(document.getElementById('ytID').value);
+      }
+      function setStartTime() {
+        document.getElementById('start').value = player.getCurrentTime();
+      }
+      function setStartTime() {
+        document.getElementById('end').value = player.getCurrentTime();
+      }
+    </script>
+     <div id="controls"> 
+      <div>
+          <label for="ytID">Youtube ID:</label>
+          <input id="ytID" type="text" name="ytID">
+          <span class="btnContainer"><button onclick="switchVideo()">Set</button></span>
+      </div>
+      <div>
+          <label for="exercise">Exercise:</label>
+          <select id="exercise">
+            <option value="squat">squat</option>
+          </select>
+          <span class="btnContainer"></span>
+      </div>
+      <div>
+          <label for="part">Part:</label>
+          <select id="part">
+            <option value="start">start</option>
+            <option value="down">down</option>
+            <option value="botton">botton</option>
+            <option value="up">up</option>
+            <option value="end">end</option>
+          </select>
+          <span class="btnContainer"></span>
+      </div>
+      <div>
+          <label for="view">View:</label>
+          <select id="view">
+            <option value="front">front</option>
+            <option value="left">left</option>
+            <option value="right">right</option>
+            <option value="behind">behind</option>
+          </select>
+          <span class="btnContainer"></span>
+      </div>
+      <div>
+        <label for="classification">Classification:</label>
+        <select id="classification">
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+        <span class="btnContainer"></span>
+    </div>
+      <div>
+          <label for="start">Start Time:</label>
+          <input id="start" type="text" name="start">
+          <span class="btnContainer"><button onclick="setStartTime()">Set</button></span>
+      </div>
+      <div>
+          <label for="end">End Time:</label>
+          <input id="end" type="text" name="end">
+          <span class="btnContainer"><button onclick="setEndTime()">Set</button></span>
+      </div>
+      <div>
+          <button id="record" value="Record">Record</button>
+      </div>
+    </div>   
+  </body>
+</html>

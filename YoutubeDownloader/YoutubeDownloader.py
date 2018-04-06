@@ -1,30 +1,35 @@
-#Nethan do this.
 import json
 import os
+import youtube_dl
 
-def downloadVideo(url, name):
-    '''
-    :param url: The url of the YouTube video.
-    :param name: The name of the file to save the YouTube video.
+
+def downloadVideo(identifier):
+    """
+    :param identifier: The identifier of the YouTube video.
     :return: None
-    '''
-    print("downloading %s from %s"%(name, url))
+    """
+    print("downloading %s" % (identifier))
+    ydl_opts = {
+        'outtmpl': 'data/videos/' + identifier,
+        'dump_single_json': 'true',
+        'merge_output_format': 'mkv'
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([identifier])
+        #ydl.prepare_filename(ydl.extract_info("{}".format(identifier)))
+
 
 def bulkDownloadVideos(videos):
-    '''
+    """
     :param videos: The array of videos to download
     :return:
-    '''
+    """
     # Read the json videos file
     print("Videos count: %d" % (len(videos)))
     for video in videos:
-        url = video['url']
-        label = video['label']
-        exercise = video['exercise']
-        sex = video['sex']
-        view = video['view']
-        filename = "%s_%s_%s_%s.mp4" % (exercise, sex, view, label)
-        downloadVideo(url, filename)
+        identifier = video['identifier']
+        filename = "%s.mkv" % (identifier)
+        downloadVideo(identifier)
 
         #Split the downloaded file into the required parts using something like
 

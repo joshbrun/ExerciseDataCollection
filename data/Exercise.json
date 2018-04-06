@@ -4,7 +4,7 @@
     {
       "name":"squat",
       "view":"front",
-      "parts":["start","down","botton","up","end"]
+      "parts":["start","down","bottom","up","end"]
     }
   ]
 }

@@ -7,8 +7,7 @@ import os
 
 #Download the videos
 videos = json.load(open(os.getcwd() + '\data\YoutubeVideos.json'))['Videos']
-
 bulkDownloadVideos(videos)
 
 #Split the videos into frames
-# splitVideos(videos)
+splitVideos(videos)

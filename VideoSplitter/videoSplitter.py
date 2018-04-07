@@ -1,5 +1,4 @@
 import os
-from ffmpy3 import FFmpeg
 #Split each video into the required frames
 
 def splitVideos(videos):

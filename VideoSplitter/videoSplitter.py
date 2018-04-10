@@ -8,16 +8,17 @@ def splitVideos(videos):
         for part in video['parts']:
             startTime = getSeconds(part['startTime'])
             endTime = getSeconds(part['endTime'])
-
             duration = endTime - startTime
 
             input = "data/videos/"+video['identifier']+".mkv"
-            outputDir = "data/frames/"+part['label']+"/"+video['exercise']+"/"+video['sex']+"/"+part['view']+"/"+part['name']
-            output = outputDir+"/frame/%05d.jpg"
+            # outputDir = "data/frames/"+part['label']+"/"+video['exercise']+"/"+video['sex']+"/"+part['view']+"/"+part['name']
+            outputDir = "data/frames/"
+            fileName = part['label'] + "_" + video['exercise'] + "_" + video['sex'] + "_" + part['view'] + "_" + part['name'] + "_" + video['identifier'] + "_" + "%05d.jpg"
+            output = outputDir + fileName
 
-            checkDirectory(outputDir+"/frame")
-            checkDirectory(outputDir+"/frameOP")
-            checkDirectory(outputDir+"/json")
+            checkDirectory("data/frames")
+            checkDirectory("data/framesOP")
+            checkDirectory("data/json")
             print("Extracting Frames for: %s/%s"%(video["identifier"],part['name']))
             os.system("ffmpeg.exe -loglevel panic -ss "+part['startTime']+" -t 00:00:"+str(duration)+" -i "+input+ " "+output +" -hide_banner")
 

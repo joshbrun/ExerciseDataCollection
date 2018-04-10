@@ -18,7 +18,6 @@ def downloadVideo(identifier):
         ydl.download([identifier])
         #ydl.prepare_filename(ydl.extract_info("{}".format(identifier)))
 
-
 def bulkDownloadVideos(videos):
     """
     :param videos: The array of videos to download
@@ -30,16 +29,3 @@ def bulkDownloadVideos(videos):
         identifier = video['identifier']
         filename = "%s.mkv" % (identifier)
         downloadVideo(identifier)
-
-        #Split the downloaded file into the required parts using something like
-
-        #ffmpeg - ss(starttime) -t(duration) -c: v copy - c: a copy(title.mp4)
-        #Could be done somewhere else 
-        #So we can extract the frames directly from the part clips,
-        #Instead of having to extract all the frames then approximating the frames from time and frames count
-
-
-
-
-
-

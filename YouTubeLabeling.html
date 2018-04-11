@@ -36,6 +36,9 @@
   #controls #record {
     width: 50%;
   }
+  #jsonArea {
+    width: 75%;
+  }
   </style>
   <body>
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
@@ -86,6 +89,18 @@
       }
       function setEndTime() {
         document.getElementById('end').value = player.getCurrentTime();
+      }
+      function createJson() {
+        var jsonArea = document.getElementById('jsonArea');
+        var textVal = jsonArea.value;
+        textVal = textVal + "{\n";
+        textVal = textVal + '"name":"' + document.getElementById('part').value + '"\n';
+        textVal = textVal + '"label":"' + document.getElementById('classification').value + '"\n';
+        textVal = textVal + '"view":"' + document.getElementById('view').value + '"\n';
+        textVal = textVal + '"startTime":"' + document.getElementById('start').value + '"\n';
+        textVal = textVal + '"endTime":"' + document.getElementById('end').value + '"\n';
+        textVal = textVal + '},\n';
+        jsonArea.value = textVal;
       }
     </script>
      <div id="controls"> 
@@ -141,8 +156,11 @@
           <span class="btnContainer"><button onclick="setEndTime()">Set</button></span>
       </div>
       <div>
-          <button id="record" value="Record">Record</button>
+          <button id="record" value="Record" onclick="createJson()">Record</button>
       </div>
-    </div>   
+    </div> 
+    <div>
+      <textarea id="jsonArea"></textarea>
+    </div> 
   </body>
 </html>

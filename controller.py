@@ -17,7 +17,7 @@ splitVideos(videos)
 # #This requires the bin, include, lib and models in the root dir
 os.system("bin\\OpenPoseDemo.exe --image_dir .\\data\\frames --write_images .\\data\\framesOP --write_json .\\data\\json")
 #
-# #Sort the Json files into directorys
+#Sort the Json files into directorys
 sortJsonFiles()
 
 #Process the Json files into Trainable Normalized vectors

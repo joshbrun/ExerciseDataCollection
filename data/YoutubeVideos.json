@@ -42,6 +42,48 @@
           "endTime":"0:14:49"
         }
       ]
+    },
+	{
+      "identifier":"mGvzVjuY8SY",
+      "exercise":"squat",
+      "sex":"female",
+      "parts":[
+        {
+          "name":"start",
+          "label":"true",
+          "view":"front",
+          "startTime":"0:4:34",
+          "endTime":"0:4:35"
+        },
+        {
+          "name":"down",
+          "label":"true",
+          "view":"front",
+          "startTime":"0:4:35",
+          "endTime":"0:4:36"
+        },
+        {
+          "name":"bottom",
+          "label":"true",
+          "view":"front",
+          "startTime":"0:4:36",
+          "endTime":"0:4:38"
+        },
+        {
+          "name":"up",
+          "label":"true",
+          "view":"front",
+          "startTime":"0:4:38",
+          "endTime":"0:4:39"
+        },
+        {
+          "name":"end",
+          "label":"true",
+          "view":"front",
+          "startTime":"0:4:39",
+          "endTime":"0:4:40"
+        }
+      ]
     }
   ]
 }

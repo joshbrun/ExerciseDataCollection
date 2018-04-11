@@ -3,6 +3,11 @@
   [
     {
       "name":"squat",
+      "view":"left",
+      "parts":["start","down","bottom","up","end"]
+    },
+	{
+      "name":"squat",
       "view":"front",
       "parts":["start","down","bottom","up","end"]
     }

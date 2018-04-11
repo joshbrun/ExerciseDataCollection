@@ -49,7 +49,11 @@ def calcGradients(filename):
     lines = file.readline()
     jsonLines = json.loads(lines)
     people = jsonLines['people']
-
+    result = filename.split('/')[0]
+    if result == 'True':
+        result = 1
+    else:
+        result = 0
     #TODO this is assuming there is only one person in the frame
     keypoints = people[0]['pose_keypoints_2d']
 
@@ -91,7 +95,7 @@ def calcGradients(filename):
 
     if line == "":
         line=","
-    line = "["+line[1:]+"]"
+    line = line[1:]+","+str(result)+'\n'
 
     file.close()
 
@@ -119,7 +123,7 @@ def processJson():
     for set in sets:
         dir = jsonDir+set
         setNameList = set.split("/")
-        outputFileName = setNameList[0]+"_"+setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"+setNameList[4]
+        outputFileName = setNameList[0]+"_"+setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"+setNameList[4]+".csv"
         files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
         print("\n"+ "Processing Set: "+dir)
         print("%d Files"%(len(files)))

@@ -11,7 +11,7 @@ def downloadVideo(identifier):
     print("downloading %s" % (identifier))
     ydl_opts = {
         'outtmpl': 'data/videos/' + identifier,
-        'dump_single_json': 'true',
+        'dump_single_json': False,
         'merge_output_format': 'mkv'
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -28,4 +28,5 @@ def bulkDownloadVideos(videos):
     for video in videos:
         identifier = video['identifier']
         filename = "%s.mkv" % (identifier)
-        downloadVideo(identifier)
+        if video['local'] == "false":
+            downloadVideo(identifier)

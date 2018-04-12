@@ -6,8 +6,9 @@ def splitVideos(videos):
     #For each video in videos
     for video in videos:
         for part in video['parts']:
-            startTime = getSeconds(part['startTime'])
-            endTime = getSeconds(part['endTime'])
+            startTime = round(float(part['startTime']),3)
+            endTime = round(float(part['endTime']),3)
+            print(startTime, endTime)
             duration = endTime - startTime
 
             input = "data/videos/"+video['identifier']+".mkv"

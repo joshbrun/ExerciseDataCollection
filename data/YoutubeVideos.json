@@ -5,41 +5,42 @@
       "identifier":"t2b8UdqmlFs",
       "exercise":"squat",
       "sex":"male",
+      "local":"false",
       "parts":[
         {
           "name":"start",
           "label":"true",
           "view":"left",
-          "startTime":"0:14:34",
-          "endTime":"0:14:36"
+          "startTime":"874",
+          "endTime":"876"
         },
         {
           "name":"down",
           "label":"true",
           "view":"left",
-          "startTime":"0:14:38",
-          "endTime":"0:14:40"
+          "startTime":"878",
+          "endTime":"880"
         },
         {
           "name":"bottom",
           "label":"true",
           "view":"left",
-          "startTime":"0:14:40",
-          "endTime":"0:14:44"
+          "startTime":"880",
+          "endTime":"884"
         },
         {
           "name":"up",
           "label":"true",
           "view":"left",
-          "startTime":"0:14:44",
-          "endTime":"0:14:46"
+          "startTime":"884",
+          "endTime":"886"
         },
         {
           "name":"end",
           "label":"true",
           "view":"left",
-          "startTime":"0:14:47",
-          "endTime":"0:14:49"
+          "startTime":"887",
+          "endTime":"889"
         }
       ]
     },
@@ -47,41 +48,42 @@
       "identifier":"mGvzVjuY8SY",
       "exercise":"squat",
       "sex":"male",
+      "local":"false",
       "parts":[
         {
           "name":"start",
           "label":"true",
           "view":"front",
-          "startTime":"0:4:34",
-          "endTime":"0:4:35"
+          "startTime":"274",
+          "endTime":"275"
         },
         {
           "name":"down",
           "label":"true",
           "view":"front",
-          "startTime":"0:4:35",
-          "endTime":"0:4:36"
+          "startTime":"275",
+          "endTime":"276"
         },
         {
           "name":"bottom",
           "label":"true",
           "view":"front",
-          "startTime":"0:4:36",
-          "endTime":"0:4:38"
+          "startTime":"276",
+          "endTime":"278"
         },
         {
           "name":"up",
           "label":"true",
           "view":"front",
-          "startTime":"0:4:38",
-          "endTime":"0:4:39"
+          "startTime":"278",
+          "endTime":"279"
         },
         {
           "name":"end",
           "label":"true",
           "view":"front",
-          "startTime":"0:4:39",
-          "endTime":"0:4:40"
+          "startTime":"279",
+          "endTime":"280"
         }
       ]
     },
@@ -89,6 +91,7 @@
       "identifier":"ygj6XjDHX9s",
       "exercise":"squat",
       "sex":"male",
+      "local":"false",
       "parts":[
         {
         "name":"start",

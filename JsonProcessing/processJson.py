@@ -120,26 +120,30 @@ def processJson():
     jsonDir = dir+"json\\"
 
     for set in sets:
+        print("\n" + "Processing Set: " + dir)
         setNameList = set.split("/")
-        outputFileName = setNameList[0]+"_"+setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"
-        open(outputDir + "/" + outputFileName+".csv", "w+").close()
-        outputFile = open(outputDir + "/" + outputFileName+".csv", "a")
+        print(setNameList)
+        outputFileName = setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"+setNameList[4]
+        outputFile = open(outputDir + "/" + outputFileName+".csv", "w+")
 
         for label in ["true","false"]:
 
-            dir = jsonDir+label+set
-            files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
-            print("\n"+ "Processing Set: "+dir)
-            print("%d Files"%(len(files)))
-
-            lines = []
-            for jsonFile in files:
-                lines.append(calcGradients(dir+"/"+jsonFile),label)
+            dir = jsonDir+label+"/"+set
+            try:
+                files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
 
 
-            for line in lines:
-                if not (line == "[]"):
-                    outputFile.write(line+"\n")
+                lines = []
+                for jsonFile in files:
+                    print(jsonFile)
+                    lines.append(calcGradients(dir+"/"+jsonFile, label))
+
+                for line in lines:
+                    if not (line == "[]"):
+                        print(line)
+                        outputFile.write(line+"\n")
+            except FileNotFoundError as e:
+                continue
 
         outputFile.close()
 

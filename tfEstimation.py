@@ -28,10 +28,9 @@ assert "1.4" <= tf_version, "TensorFlow r1.4 or later is needed"
 PATH = os.getcwd()
 
 # Fetch and store Training and Test dataset files
-PATH_DATASET = PATH + os.sep + "test"
-FILE_TRAIN = PATH_DATASET + os.sep + "false_squat_male_front_bottom.csv"
-FILE_TEST = PATH_DATASET + os.sep + "false_squat_male_front_bottom.csv"
-
+PATH_DATASET = PATH
+FILE_TRAIN = PATH_DATASET + os.sep + "squat_male_front.csv"
+FILE_TEST = PATH_DATASET + os.sep + "squat_male_front.csv"
 
 def download_dataset(url, file):
     if not os.path.exists(PATH_DATASET):

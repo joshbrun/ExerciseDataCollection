@@ -117,22 +117,26 @@ def processJson():
     jsonDir = dir+"json\\"
 
     for set in sets:
-        dir = jsonDir+set
         setNameList = set.split("/")
-        outputFileName = setNameList[0]+"_"+setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"+setNameList[4]
-        files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
-        print("\n"+ "Processing Set: "+dir)
-        print("%d Files"%(len(files)))
+        outputFileName = setNameList[0]+"_"+setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"
+        open(outputDir + "/" + outputFileName, "w+").close()
+        outputFile = open(outputDir + "/" + outputFileName, "a")
 
-        lines = []
-        for jsonFile in files:
-            lines.append(calcGradients(dir+"/"+jsonFile))
-        open(outputDir+"/"+outputFileName,"w+").close()
-        outputFile = open(outputDir+"/"+outputFileName,"a")
+        for label in ["true","false"]:
 
-        for line in lines:
-            if not (line == "[]"):
-                outputFile.write(line+"\n")
+            dir = jsonDir+label+set
+            files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+            print("\n"+ "Processing Set: "+dir)
+            print("%d Files"%(len(files)))
+
+            lines = []
+            for jsonFile in files:
+                lines.append(calcGradients(dir+"/"+jsonFile))
+
+
+            for line in lines:
+                if not (line == "[]"):
+                    outputFile.write(line+"\n")
 
         outputFile.close()
 

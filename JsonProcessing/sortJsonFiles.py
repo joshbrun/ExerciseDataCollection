@@ -22,7 +22,7 @@ def sortJsonFiles():
         try:
             rename(dir+file, dir+newDir+newFile)
             if not (newDir in jsonFiles):
-                jsonFiles.append(newDir)
+                jsonFiles.append("/"+fileArray[1]+"/"+fileArray[2]+"/"+fileArray[3]+"/"+fileArray[4]+"/")
         except FileExistsError as e:
             excludedCount = excludedCount + 1
             includedCount = includedCount - 1

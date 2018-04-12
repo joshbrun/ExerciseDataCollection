@@ -43,7 +43,11 @@ JOINTS_MAPPING = {
 }
 
 
-def calcGradients(filename):
+def calcGradients(filename, label):
+    correctness = 0
+    if label == "true":
+        correctness = 1
+
     line = ""
     file = open(filename,'r')
     lines = file.readline()
@@ -89,9 +93,8 @@ def calcGradients(filename):
             g = (float(y2)-float(y1))/(float(x2)-float(x1))
             line += ",%.4f,%.3f,%.3f"%(g,c1,c2)
 
-    if line == "":
-        line=","
-    line = "["+line[1:]+"]"
+    if not line == "":
+        line = line[1:]+","+str(correctness)
 
     file.close()
 
@@ -131,7 +134,7 @@ def processJson():
 
             lines = []
             for jsonFile in files:
-                lines.append(calcGradients(dir+"/"+jsonFile))
+                lines.append(calcGradients(dir+"/"+jsonFile),label)
 
 
             for line in lines:

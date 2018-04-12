@@ -84,6 +84,41 @@
           "endTime":"0:4:40"
         }
       ]
+    },
+    {
+      "identifier":"ygj6XjDHX9s",
+      "exercise":"squat",
+      "sex":"male",
+      "parts":[
+        {
+        "name":"start"
+        "label":"true"
+        "view":"front"
+        "startTime":"54.885156"
+        "endTime":"55.075028"
+        },
+        {
+        "name":"down"
+        "label":"true"
+        "view":"front"
+        "startTime":"55.075028"
+        "endTime":"56.036981"
+        },
+        {
+        "name":"bottom"
+        "label":"true"
+        "view":"front"
+        "startTime":"56.036981"
+        "endTime":"56.276204"
+        },
+        {
+        "name":"up"
+        "label":"true"
+        "view":"front"
+        "startTime":"56.276204"
+        "endTime":"56.796756"
+        }
+      ]
     }
   ]
 }

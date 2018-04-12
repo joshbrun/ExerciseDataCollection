@@ -122,8 +122,8 @@ def processJson():
     for set in sets:
         setNameList = set.split("/")
         outputFileName = setNameList[0]+"_"+setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"
-        open(outputDir + "/" + outputFileName, "w+").close()
-        outputFile = open(outputDir + "/" + outputFileName, "a")
+        open(outputDir + "/" + outputFileName+".csv", "w+").close()
+        outputFile = open(outputDir + "/" + outputFileName+".csv", "a")
 
         for label in ["true","false"]:
 

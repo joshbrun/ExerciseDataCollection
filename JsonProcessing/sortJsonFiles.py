@@ -35,6 +35,7 @@ def sortJsonFiles():
         f.write(file+"\n")
 
     print("Json created for %d/%d files, %d already existed "%(includedCount, fileCount, excludedCount))
+    f.close()
 
 def checkDirectory(path):
     if not exists(path):

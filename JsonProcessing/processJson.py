@@ -42,8 +42,8 @@ JOINTS_MAPPING = {
     17:[15,17]
 }
 
-
 def calcGradients(filename, label):
+    # print("Calculating Gradients for filename: "+filename+", label: "+label);
     correctness = 0
     if label == "true":
         correctness = 1
@@ -101,7 +101,7 @@ def calcGradients(filename, label):
     return line
 
 def processJson():
-    print("\nConverting the seperate Json files into a Trainable Vector Set")
+    print("\nConverting the separate Json files into a Trainable Vector Set")
     outputDir = os.getcwd()+"\\training"
     checkDirectory(outputDir)
 
@@ -112,35 +112,33 @@ def processJson():
     sets = []
 
     for line in file.readlines():
-        sets.append(line[:-2])
+        if not line[:-2] in sets:
+            sets.append(line[:-2])
     file.close()
 
     print("Sets to process: %d"%(len(sets)))
 
     jsonDir = dir+"json\\"
-
     for set in sets:
-        print("\n" + "Processing Set: " + dir)
         setNameList = set.split("/")
-        print(setNameList)
+        # print(setNameList)
         outputFileName = setNameList[1]+"_"+setNameList[2]+"_"+setNameList[3]+"_"+setNameList[4]
         outputFile = open(outputDir + "/" + outputFileName+".csv", "w+")
 
         for label in ["true","false"]:
-
             dir = jsonDir+label+"/"+set
+            print("\n" + "Processing Set: " + dir)
             try:
                 files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
 
-
                 lines = []
                 for jsonFile in files:
-                    print(jsonFile)
+                    # print(jsonFile)
                     lines.append(calcGradients(dir+"/"+jsonFile, label))
 
                 for line in lines:
                     if not (line == "[]"):
-                        print(line)
+                        # print(line)
                         outputFile.write(line+"\n")
             except FileNotFoundError as e:
                 continue

@@ -94,10 +94,10 @@
         var jsonArea = document.getElementById('jsonArea');
         var textVal = jsonArea.value;
         textVal = textVal + "{\n";
-        textVal = textVal + '"name":"' + document.getElementById('part').value + '"\n';
-        textVal = textVal + '"label":"' + document.getElementById('classification').value + '"\n';
-        textVal = textVal + '"view":"' + document.getElementById('view').value + '"\n';
-        textVal = textVal + '"startTime":"' + document.getElementById('start').value + '"\n';
+        textVal = textVal + '"name":"' + document.getElementById('part').value + '",\n';
+        textVal = textVal + '"label":"' + document.getElementById('classification').value + '",\n';
+        textVal = textVal + '"view":"' + document.getElementById('view').value + '",\n';
+        textVal = textVal + '"startTime":"' + document.getElementById('start').value + '",\n';
         textVal = textVal + '"endTime":"' + document.getElementById('end').value + '"\n';
         textVal = textVal + '},\n';
         jsonArea.value = textVal;

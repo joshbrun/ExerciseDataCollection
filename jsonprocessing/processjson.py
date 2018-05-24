@@ -5,7 +5,6 @@ processjson.js converts multiple openpose Frames into trainable data sets.
 Author: Joshua Brundan, Nathan Henderson
 """
 
-
 import os
 import json
 import sys
@@ -30,6 +29,10 @@ PART_MAPPING = {
     16: "REar",
     17: "LEar"
 }
+
+# Grainulatity
+JOINT_SECTIONS = ["JOINTS_MAPPING", "JOINTS_MAPPING_ARML", "JOINTS_MAPPING_ARMR"]
+# Full
 JOINTS_MAPPING = {
     1: [0, 1],
     2: [0, 14],
@@ -50,6 +53,19 @@ JOINTS_MAPPING = {
     17: [15, 17]
 }
 
+# Body Sections
+# ArmL
+JOINTS_ARML = [10, 11]
+# ArmR
+JOINTS_ARMR = [8, 9]
+# LegL
+JOINTS_LEGL = [14, 15]
+# LegR
+JOINTS_LEGR = [12, 13]
+# Chest
+JOINTS_CHEST = [6, 7]
+# Head
+JOINTS_HEAD = [2, 3, 16, 17]
 
 def calculate_gradients_coarse(filename, label):
     """
@@ -115,11 +131,10 @@ def calculate_gradients_coarse(filename, label):
     return line
 
 
-def process_json(input_dir: str,  output_dir: str) -> None:
+def process_json(input_dir: str, output_dir: str) -> None:
     """
     Processes the Json files into trainable data sets.
     :param input_dir: The location of the Json data.
-    :param data_dir: The location of the data directory.
     :param output_dir: The location of the Training directory.
     """
     print("\nConverting the separate Json files into a Trainable Vector Set")
@@ -139,6 +154,7 @@ def process_json(input_dir: str,  output_dir: str) -> None:
     print("Sets to process: %d" % (len(sets)))
 
     json_dir = os.path.join(input_dir, "json")
+
     for data_set in sets:
         set_name_list = data_set.split("/")
 

@@ -10,6 +10,11 @@
       "name":"squat",
       "view":"front",
       "parts":["start","down","bottom","up","end"]
+    },
+    {
+      "name":"squat",
+      "view":"right",
+      "parts":["start","down","bottom","up","end"]
     }
   ]
 }

@@ -14,11 +14,18 @@ def split_videos(videos):
     """
     print("\n")
     # For each video in videos
+
+    count = 0
+    for video in videos:
+        for part in video['parts']:
+            count += 1
+
+    print("Extracting frames from",count," Clips")
+
     for video in videos:
         for part in video['parts']:
             start_time = round(float(part['startTime']), 3)
             end_time = round(float(part['endTime']), 3)
-            print(start_time, end_time)
             duration = end_time - start_time
 
             input_name = "data/videos/" + video['identifier'] + ".mkv"
@@ -30,14 +37,14 @@ def split_videos(videos):
             check_directory("data/frames")
             check_directory("data/framesOP")
             check_directory("data/json")
-            print("Extracting Frames for: %s/%s" % (video["identifier"], part['name']))
             os.system("ffmpeg.exe -loglevel panic -ss " + part['startTime'] + " -t 00:00:" + str(
                 duration) + " -i " + input_name + " " + output + " -hide_banner")
+    print("Finished extracting frames from", count, "clips\n")
+
 
 
 def check_directory(path):
     """
-
     :param path:
     """
     if not os.path.exists(path):
@@ -46,7 +53,6 @@ def check_directory(path):
 
 def get_seconds(time):
     """
-
     :param time:
     :return:
     """

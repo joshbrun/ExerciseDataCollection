@@ -41,6 +41,7 @@ def sort_json_files():
             remove(json_dir + file_name)
 
     f = open("data/exerciseList", 'a+')
+    json_files = set(json_files)
     for file_name in json_files:
         print(file_name)
         f.write(file_name + "\n")

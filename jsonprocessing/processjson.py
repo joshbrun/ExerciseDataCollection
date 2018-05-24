@@ -51,7 +51,7 @@ JOINTS_MAPPING = {
 }
 
 
-def calculate_gradients(filename, label):
+def calculate_gradients_coarse(filename, label):
     """
 
     :param filename:
@@ -147,14 +147,13 @@ def process_json(input_dir: str,  output_dir: str) -> None:
 
         for label in ["true", "false"]:
             set_dir = json_dir + "/" + label + "/" + data_set
-            print("\n" + "Processing Set: " + set_dir)
             try:
                 files = [f for f in os.listdir(set_dir) if os.path.isfile(os.path.join(set_dir, f))]
 
                 lines = []
                 for json_file in files:
                     # print(jsonFile)
-                    lines.append(calculate_gradients(set_dir + "/" + json_file, label))
+                    lines.append(calculate_gradients_coarse(set_dir + "/" + json_file, label))
 
                 for line in lines:
                     if not (line == "[]"):
@@ -165,6 +164,7 @@ def process_json(input_dir: str,  output_dir: str) -> None:
                 continue
 
         output_file.close()
+    print("Sets Processed")
 
 
 def check_directory(path: str) -> None:

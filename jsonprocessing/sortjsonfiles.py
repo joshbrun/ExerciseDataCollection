@@ -4,8 +4,12 @@
 sorts the json files from a single directory into a multiple directories.
 """
 
-from os import listdir, getcwd, rename, makedirs, remove
-from os.path import isfile, join, exists
+from os import listdir, getcwd, rename, remove
+from os.path import isfile, join
+import sys
+
+sys.path.append(join(getcwd(), "utilities"))
+from utilities.fileutilities import check_directory
 
 
 def sort_json_files():
@@ -48,12 +52,3 @@ def sort_json_files():
 
     print("Json created for %d/%d files, %d already existed " % (included_count, file_count, excluded_count))
     f.close()
-
-
-def check_directory(path):
-    """
-
-    :param path:
-    """
-    if not exists(path):
-        makedirs(path)

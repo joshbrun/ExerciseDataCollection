@@ -4,7 +4,12 @@
 Splits videos into video clips, and then splits th video clips into images.
 """
 
-import os
+from os import system, getcwd
+from os.path import join
+import sys
+
+sys.path.append(join(getcwd(), "utilities"))
+from utilities.fileutilities import check_directory
 
 
 def split_videos(videos):
@@ -17,10 +22,10 @@ def split_videos(videos):
 
     count = 0
     for video in videos:
-        for part in video['parts']:
+        for _ in video['parts']:
             count += 1
 
-    print("Extracting frames from",count," Clips")
+    print("Extracting frames from", count, " Clips")
 
     for video in videos:
         for part in video['parts']:
@@ -37,18 +42,11 @@ def split_videos(videos):
             check_directory("data/frames")
             check_directory("data/framesOP")
             check_directory("data/json")
-            os.system("ffmpeg.exe -loglevel panic -ss " + part['startTime'] + " -t 00:00:" + str(
-                duration) + " -i " + input_name + " " + output + " -hide_banner")
+
+            command = "ffmpeg.exe -loglevel panic -ss " + part['startTime'] + " -t 00:00:" + str(
+                duration) + " -i " + input_name + " " + output + " -hide_banner"
+            system(command)
     print("Finished extracting frames from", count, "clips\n")
-
-
-
-def check_directory(path):
-    """
-    :param path:
-    """
-    if not os.path.exists(path):
-        os.makedirs(path)
 
 
 def get_seconds(time):

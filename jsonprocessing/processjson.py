@@ -5,9 +5,13 @@ processjson.js converts multiple openpose Frames into trainable data sets.
 Author: Joshua Brundan, Nathan Henderson
 """
 
-import os
+from os import getcwd, listdir
 import json
+from os.path import join, isfile
 import sys
+
+sys.path.append(join(getcwd(), "utilities"))
+from utilities.fileutilities import check_directory
 
 PART_MAPPING = {
     0: "Nose",
@@ -67,9 +71,9 @@ JOINTS_CHEST = [6, 7]
 # Head
 JOINTS_HEAD = [2, 3, 16, 17]
 
+
 def calculate_gradients_coarse(filename, label):
     """
-
     :param filename:
     :param label:
     :return:
@@ -143,7 +147,7 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
     # Read the sets
     file_name = "exerciseList"
-    file = open(os.path.join(input_dir, file_name), 'r')
+    file = open(join(input_dir, file_name), 'r')
     sets = []
 
     for line in file.readlines():
@@ -153,7 +157,7 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
     print("Sets to process: %d" % (len(sets)))
 
-    json_dir = os.path.join(input_dir, "json")
+    json_dir = join(input_dir, "json")
 
     for data_set in sets:
         set_name_list = data_set.split("/")
@@ -164,7 +168,7 @@ def process_json(input_dir: str, output_dir: str) -> None:
         for label in ["true", "false"]:
             set_dir = json_dir + "/" + label + "/" + data_set
             try:
-                files = [f for f in os.listdir(set_dir) if os.path.isfile(os.path.join(set_dir, f))]
+                files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
 
                 lines = []
                 for json_file in files:
@@ -181,12 +185,3 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
         output_file.close()
     print("Sets Processed")
-
-
-def check_directory(path: str) -> None:
-    """
-    Checks if a directory exists, if not creates a new one
-    :param path: The path of the directory
-    """
-    if not os.path.exists(path):
-        os.makedirs(path)

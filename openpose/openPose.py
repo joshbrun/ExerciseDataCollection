@@ -45,8 +45,7 @@ def run_openpose(input_dir, output_dir):
         input_dir = os.path.join("..", input_dir)
 
         openpose = ".\\bin\\OpenPoseDemo.exe"
-        command = openpose + " --image_dir " + input_dir + " --write_json " + output_dir + " --display 0" \
-                                                                                                       " -render_pose 0"
+        command = openpose + " --image_dir " + input_dir + " --write_json " + output_dir + " --display 0 -render_pose 0"
         # Run the command
 
         print("Running OpenPose")

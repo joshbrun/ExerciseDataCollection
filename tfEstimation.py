@@ -19,10 +19,6 @@ import os
 import six.moves.urllib.request as request
 import tensorflow as tf
 
-# Check that we have correct TensorFlow version installed
-tf_version = tf.__version__
-print("TensorFlow version: {}".format(tf_version))
-assert "1.4" <= tf_version, "TensorFlow r1.4 or later is needed"
 
 # Windows users: You only need to change PATH, rest is platform independent
 PATH = os.getcwd()
@@ -31,15 +27,6 @@ PATH = os.getcwd()
 PATH_DATASET = PATH
 FILE_TRAIN = PATH_DATASET + os.sep + "squat_male_front.csv"
 FILE_TEST = PATH_DATASET + os.sep + "squat_male_front.csv"
-
-def download_dataset(url, file):
-    if not os.path.exists(PATH_DATASET):
-        os.makedirs(PATH_DATASET)
-    if not os.path.exists(file):
-        data = request.urlopen(url).read()
-        with open(file, "wb") as f:
-            f.write(data)
-            f.close()
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -54,20 +41,20 @@ def my_input_fn(file_path, perform_shuffle=False, repeat_count=1):
         decoder = [[0.]] * 51
         decoder.append([0])
         parsed_line = tf.decode_csv(line, decoder)
-        label = parsed_line[-1]  # Last element is the label
-        del parsed_line[-1]  # Delete last element
-        features = parsed_line  # Everything but last elements are the features
+        label = parsed_line[-1]     # Last element is the label
+        del parsed_line[-1]         # Delete last element
+        features = parsed_line      # Everything but last elements are the features
         d = dict(zip(feature_names, features)), label
         return d
 
-    dataset = (tf.data.TextLineDataset(file_path)  # Read text file
-               .skip(1)  # Skip header row
-               .map(decode_csv))  # Transform each elem by applying decode_csv fn
+    dataset = (tf.data.TextLineDataset(file_path)   # Read text file
+               .skip(1)                             # Skip header row
+               .map(decode_csv))                    # Transform each elem by applying decode_csv fn
     if perform_shuffle:
         # Randomizes input using a window of 256 elements (read into memory)
         dataset = dataset.shuffle(buffer_size=256)
     dataset = dataset.repeat(repeat_count)  # Repeats dataset this # times
-    dataset = dataset.batch(32)  # Batch size to use
+    dataset = dataset.batch(32)             # Batch size to use
     iterator = dataset.make_one_shot_iterator()
     batch_features, batch_labels = iterator.get_next()
     return batch_features, batch_labels
@@ -81,16 +68,16 @@ feature_columns = [tf.feature_column.numeric_column(k) for k in feature_names]
 # Create a deep neural network regression classifier
 # Use the DNNClassifier pre-made estimator
 classifier = tf.estimator.DNNClassifier(
-    feature_columns=feature_columns,  # The input features to our model
-    hidden_units=[10, 10],  # Two layers, each with 10 neurons
-    n_classes=3,
-    model_dir=PATH)  # Path to where checkpoints etc are stored
+    feature_columns=feature_columns,    # The input features to our model
+    hidden_units=[50, 40, 30, 20, 10],              # Two layers, each with 10 neurons
+    n_classes=2,                        # Number of classes, currently good or bad
+    model_dir=PATH)                     # Path to where checkpoints etc are stored
 
 # Train our model, use the previously defined function my_input_fn
 # Input to training is a file with training example
 # Stop training after 8 iterations of train data (epochs)
 classifier.train(
-    input_fn=lambda: my_input_fn(FILE_TRAIN, True, 8))
+    input_fn=lambda: my_input_fn(FILE_TRAIN, True, 128))
 
 # Evaluate our model using the examples contained in FILE_TEST
 # Return value will contain evaluation_metrics such as: loss & average_loss
@@ -105,11 +92,12 @@ for key in evaluate_result:
 predict_results = classifier.predict(
     input_fn=lambda: my_input_fn(FILE_TEST, False, 1))
 print("Predictions on test file")
+'''
 for prediction in predict_results:
     # Will print the predicted class, i.e: 0, 1, or 2 if the prediction
     # is Iris Sentosa, Vericolor, Virginica, respectively.
     print(prediction["class_ids"][0])
-
+'''
 '''
 # Let create a dataset for prediction
 # We've taken the first 3 examples in FILE_TEST

@@ -24,7 +24,7 @@ TRAINING_DIR = "training"
 video_path = join(DATA_DIR, VIDEO_FILE)
 frames_path = join(DATA_DIR, FRAMES_DIR)
 json_path = join(DATA_DIR, JSON_DIR)
-training_path = join(DATA_DIR, JSON_DIR)
+training_path = join(DATA_DIR, TRAINING_DIR)
 
 # Sequential Pipeline flow
 # Gets the list of videos

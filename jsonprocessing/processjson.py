@@ -198,7 +198,10 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
         output_file_name = set_name_list[1] + "_" + set_name_list[2] + "_" + set_name_list[3] + "_" + set_name_list[4]
         output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
-        hcs_output_file = open(output_dir + "/" + "hcs" + output_file_name + ".csv", "w+")
+        hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
+        agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
+        output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
+        hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
 
         for label in ["true", "false"]:
             set_dir = json_dir + "/" + label + "/" + data_set
@@ -214,12 +217,13 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
                 for line in lines:
                     if not (line == "[]"):
-                        # print(line)
                         output_file.write(line + "\n")
+                        output_agg_file.write(line + "\n")
                 
                 for line in hcs_lines:
                     if not (line == "[]"):
                         hcs_output_file.write(line + "\n")
+                        hcs_output_agg_file.write(line + "\n")
 
             except FileNotFoundError as e:
                 print(e)

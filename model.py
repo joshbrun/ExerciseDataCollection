@@ -1,5 +1,7 @@
 import os
 import tensorflow as tf
+import matplotlib
+import matplotlib.pyplot as plt
 
 PATH = os.getcwd()
 
@@ -12,7 +14,7 @@ FILE_TEST = PATH_DATASET + os.sep + "data/training/hcs_squat_front.csv"  # "tes_
 def train(training_file, testing_file, epochs):
     next_batch = get_dataset(training_file, True)       # Will return 32 random elements
 
-    feature_names = [str(i) for i in range(75)]
+    feature_names = [str(i) for i in range(50)]
     feature_columns = [tf.feature_column.numeric_column(k) for k in feature_names]
 
     # create classifier that will be used
@@ -21,6 +23,10 @@ def train(training_file, testing_file, epochs):
         hidden_units=[10, 10],              # Two layers, each with 10 neurons
         n_classes=2,                                    # Number of classes, currently good or bad
         optimizer=tf.train.AdamOptimizer(1e-4),         # Use Adam optimiser with default setting
+        # optimizer=tf.train.ProximalAdagradOptimizer(
+        #     learning_rate=0.001,
+        #     l1_regularization_strength=0.01),
+        #     config=tf.estimator.RunConfig().replace(save_summary_steps=10),
         dropout=0.1,                                    # Add dropout to reduce overfitting
         model_dir=os.getcwd()+"/modeloutput/")          # Path to where checkpoints etc are stored
 
@@ -39,13 +45,13 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     def decode_csv(line):
-        feature_names = [str(i) for i in range(75)]
+        feature_names = [str(i) for i in range(50)]
         decoder = [[0.]] * 75
         decoder.append([0])
         parsed_line = tf.decode_csv(line, decoder)
         label = parsed_line[-1]     # Last element is the label
         del parsed_line[-1]         # Delete last element
-        #parsed_line = [parsed_line[i] for i in range(75) if i % 3 != 0]
+        parsed_line = [parsed_line[i] for i in range(75) if i % 3 != 0]
         features = parsed_line      # Everything but last elements are the features
         d = dict(zip(feature_names, features)), label
         return d
@@ -61,4 +67,4 @@ def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     batch_features, batch_labels = iterator.get_next()
     return batch_features, batch_labels
 
-train(FILE_TRAIN, FILE_TEST, 100)
+train(FILE_TRAIN, FILE_TEST, 50)

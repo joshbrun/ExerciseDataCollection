@@ -26,12 +26,12 @@ PATH = os.getcwd()
 # Fetch and store Training and Test dataset files
 PATH_DATASET = PATH
 FILE_TRAIN = PATH_DATASET + os.sep + "squat_male_front.csv"
-FILE_TEST = PATH_DATASET + os.sep + "squat_male_front.csv"
+FILE_TEST = PATH_DATASET + os.sep + "tes_fem.csv" #squat_male_front.csv"
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
 # The CSV features in our training & test data
-feature_names = [str(i) for i in range(51)]
+feature_names = [str(i) for i in range(17)]#51)]
 # Create an input function reading a file using the Dataset API
 # Then provide the results to the Estimator API
 
@@ -43,18 +43,20 @@ def my_input_fn(file_path, perform_shuffle=False, repeat_count=1):
         parsed_line = tf.decode_csv(line, decoder)
         label = parsed_line[-1]     # Last element is the label
         del parsed_line[-1]         # Delete last element
+        parsed_line = parsed_line[::3]
+        print(parsed_line)
         features = parsed_line      # Everything but last elements are the features
         d = dict(zip(feature_names, features)), label
         return d
 
     dataset = (tf.data.TextLineDataset(file_path)   # Read text file
-               .skip(1)                             # Skip header row
+               #.skip(1)                             # Skip header row
                .map(decode_csv))                    # Transform each elem by applying decode_csv fn
     if perform_shuffle:
         # Randomizes input using a window of 256 elements (read into memory)
         dataset = dataset.shuffle(buffer_size=256)
     dataset = dataset.repeat(repeat_count)  # Repeats dataset this # times
-    dataset = dataset.batch(32)             # Batch size to use
+    dataset = dataset.batch(16)             # Batch size to use
     iterator = dataset.make_one_shot_iterator()
     batch_features, batch_labels = iterator.get_next()
     return batch_features, batch_labels
@@ -71,13 +73,15 @@ classifier = tf.estimator.DNNClassifier(
     feature_columns=feature_columns,    # The input features to our model
     hidden_units=[50, 40, 30, 20, 10],              # Two layers, each with 10 neurons
     n_classes=2,                        # Number of classes, currently good or bad
-    model_dir=PATH)                     # Path to where checkpoints etc are stored
+    optimizer=tf.train.AdamOptimizer(1e-4),
+    dropout=0.1,
+    model_dir=PATH+"/model/")                     # Path to where checkpoints etc are stored
 
 # Train our model, use the previously defined function my_input_fn
 # Input to training is a file with training example
 # Stop training after 8 iterations of train data (epochs)
 classifier.train(
-    input_fn=lambda: my_input_fn(FILE_TRAIN, True, 128))
+    input_fn=lambda: my_input_fn(FILE_TRAIN, True, 5000))
 
 # Evaluate our model using the examples contained in FILE_TEST
 # Return value will contain evaluation_metrics such as: loss & average_loss

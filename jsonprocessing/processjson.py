@@ -72,6 +72,41 @@ JOINTS_CHEST = [6, 7]
 JOINTS_HEAD = [2, 3, 16, 17]
 
 
+def calculate_hcs(filename, label):
+    """
+    :param filename:
+    :param label:
+    :return:
+    """
+    # print("Calculating Gradients for filename: "+filename+", label: "+label);
+    correctness = 0
+    if label == "true":
+        correctness = 1
+
+    line = ""
+    file = open(filename, 'r')
+    lines = file.readline()
+    people = json.loads(lines)['people']
+
+    # If there are more than one person in the frame only use the first.
+    key_points = people[0]['pose_keypoints_2d']
+
+    right_hip_x = key_points[8 * 3]
+    right_hip_y = key_points[8 * 3 + 1]
+
+    # normalise around the right hip
+    for i in range(0, len(key_points)):
+        if i % 3 == 0:
+            key_points[i] -= right_hip_x
+        if i % 3 == 1:
+            key_points[i] -= right_hip_y
+    line = ",".join(map(str, key_points))
+    line += "," + str(correctness)
+
+    file.close()
+
+    return line
+
 def calculate_gradients_coarse(filename, label):
     """
     :param filename:
@@ -134,7 +169,6 @@ def calculate_gradients_coarse(filename, label):
 
     return line
 
-
 def process_json(input_dir: str, output_dir: str) -> None:
     """
     Processes the Json files into trainable data sets.
@@ -164,6 +198,10 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
         output_file_name = set_name_list[1] + "_" + set_name_list[2] + "_" + set_name_list[3] + "_" + set_name_list[4]
         output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
+        hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
+        agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
+        output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
+        hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
 
         for label in ["true", "false"]:
             set_dir = json_dir + "/" + label + "/" + data_set
@@ -171,14 +209,22 @@ def process_json(input_dir: str, output_dir: str) -> None:
                 files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
 
                 lines = []
+                hcs_lines = []
                 for json_file in files:
                     # print(jsonFile)
                     lines.append(calculate_gradients_coarse(set_dir + "/" + json_file, label))
+                    hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
 
                 for line in lines:
                     if not (line == "[]"):
-                        # print(line)
                         output_file.write(line + "\n")
+                        output_agg_file.write(line + "\n")
+                
+                for line in hcs_lines:
+                    if not (line == "[]"):
+                        hcs_output_file.write(line + "\n")
+                        hcs_output_agg_file.write(line + "\n")
+
             except FileNotFoundError as e:
                 print(e)
                 continue

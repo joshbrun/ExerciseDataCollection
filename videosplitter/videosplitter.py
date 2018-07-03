@@ -4,9 +4,10 @@
 Splits videos into video clips, and then splits th video clips into images.
 """
 
-from os import system, getcwd
+from os import system, getcwd, name
 from os.path import join
 import sys
+import os
 
 sys.path.append(join(getcwd(), "utilities"))
 from utilities.fileutilities import check_directory
@@ -43,7 +44,11 @@ def split_videos(videos):
             check_directory("data/framesOP")
             check_directory("data/json")
 
-            command = "ffmpeg.exe -loglevel panic -ss " + part['startTime'] + " -t 00:00:" + str(
+            if os.name == "posix":
+                command = "ffmpeg"
+            else:
+                command = "ffmpeg.exe"
+            command += " -loglevel panic -ss " + part['startTime'] + " -t 00:00:" + str(
                 duration) + " -i " + input_name + " " + output + " -hide_banner"
             system(command)
     print("Finished extracting frames from", count, "clips\n")

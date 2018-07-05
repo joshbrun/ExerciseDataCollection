@@ -7,14 +7,14 @@ PATH = os.getcwd()
 
 # Fetch and store Training and Test dataset files
 PATH_DATASET = PATH
-FILE_TRAIN = PATH_DATASET + os.sep + "data/training/squat_front.csv" # "squat_male_front.csv"
-FILE_TEST = PATH_DATASET + os.sep + "data/training/squat_front.csv"  # "tes_fem.csv" 
+FILE_TRAIN = PATH_DATASET + os.sep + "data/training/hcs_squat_front.csv" # "squat_male_front.csv"
+FILE_TEST = PATH_DATASET + os.sep + "data/validation/hcs_squat_front.csv"  # "tes_fem.csv" 
 
 
 def train(training_file, testing_file, epochs):
     next_batch = get_dataset(training_file, True)       # Will return 32 random elements
 
-    feature_names = [str(i) for i in range(17)]#50)]
+    feature_names = [str(i) for i in range(50)]
     feature_columns = [tf.feature_column.numeric_column(k) for k in feature_names]
 
     my_checkpointing_config = tf.estimator.RunConfig(
@@ -61,13 +61,13 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     def decode_csv(line):
-        feature_names = [str(i) for i in range(17)]#50)]
-        decoder = [[0.]] * 51 #75
+        feature_names = [str(i) for i in range(50)]#17)]
+        decoder = [[0.]] * 75 #51
         decoder.append([0])
         parsed_line = tf.decode_csv(line, decoder)
         label = parsed_line[-1]     # Last element is the label
         del parsed_line[-1]         # Delete last element
-        parsed_line = [parsed_line[i] for i in range(51) if i % 3 != 0]
+        parsed_line = [parsed_line[i] for i in range(75) if i % 3 != 0]
         features = parsed_line      # Everything but last elements are the features
         d = dict(zip(feature_names, features)), label
         return d
@@ -84,4 +84,4 @@ def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     return batch_features, batch_labels
 
 for i in range (50):
-    train(FILE_TRAIN, FILE_TEST, 50)
+    train(FILE_TRAIN, FILE_TEST, 10)

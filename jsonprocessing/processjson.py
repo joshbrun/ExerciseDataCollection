@@ -175,13 +175,14 @@ def process_json(input_dir: str, output_dir: str) -> None:
     :param input_dir: The location of the Json data.
     :param output_dir: The location of the Training directory.
     """
+    expanding_set = True
     print("\nConverting the separate Json files into a Trainable Vector Set")
     check_directory(output_dir)
     check_directory(input_dir)
 
     # Read the sets
     file_name = "exerciseList"
-    file = open(join(input_dir, file_name), 'r')
+    file = open(join("data", file_name), 'r')
     sets = []
 
     for line in file.readlines():
@@ -191,7 +192,7 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
     print("Sets to process: %d" % (len(sets)))
 
-    json_dir = join(input_dir, "json")
+    json_dir = input_dir #join(input_dir, "json")
 
     for data_set in sets:
         set_name_list = data_set.split("/")
@@ -221,9 +222,10 @@ def process_json(input_dir: str, output_dir: str) -> None:
                         output_agg_file.write(line + "\n")
                 
                 for line in hcs_lines:
-                    if not (line == "[]"):
-                        hcs_output_file.write(line + "\n")
-                        hcs_output_agg_file.write(line + "\n")
+                    for ex_line in expand_set(line):
+                        if not (ex_line == "[]"):
+                            hcs_output_file.write(ex_line + "\n")
+                            hcs_output_agg_file.write(ex_line + "\n")
 
             except FileNotFoundError as e:
                 print(e)
@@ -231,3 +233,27 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
         output_file.close()
     print("Sets Processed")
+
+def expand_set(line):
+    return [line]
+    # line = line.split(",")
+    # lines = []
+    # lines.append(line)
+    # lines.append(mirror(line))
+    # # new_lines = []
+    # # for l in lines:
+    # #     new_lines.append(scale(l, 0.8))
+    # #     new_lines.append(scale(l, 1.2))
+    # # lines += new_lines
+    # final_lines = []
+    # for l in lines:
+    #     final_lines.append(",".join(map(str, l)))
+    # return final_lines
+
+def mirror(line):
+    return scale(line, -1)
+
+def scale(line, scale_factor):
+    line_copy = line.copy()
+    line_copy = [line[i] if i % 3 == 2 or i + 1 == len(line) else scale_factor * float(line[i]) for i in range(len(line))]
+    return line_copy

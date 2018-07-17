@@ -12,7 +12,7 @@ sys.path.append(join(getcwd(), "utilities"))
 from utilities.fileutilities import check_directory
 
 
-def sort_json_files():
+def sort_json_files(input_dir):
     """
     sorts json files
     """
@@ -21,7 +21,7 @@ def sort_json_files():
     # into
     # /true/squat/male/left/up/t2b8fDsAlFs_00035_keypoints
     json_files = []
-    json_dir = getcwd() + "/data/json/"
+    json_dir = input_dir + "/" #getcwd() + "/data/json/"
 
     files = [f for f in listdir(json_dir) if isfile(join(json_dir, f))]
     file_count = len(files)

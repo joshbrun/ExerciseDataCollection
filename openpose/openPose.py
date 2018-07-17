@@ -54,7 +54,7 @@ def run_openpose(input_dir, output_dir):
             openpose = ".\\bin\\OpenPoseDemo.exe"
         
         # keypoint_scale 4 normalises between 1 and -1
-        command = openpose + " --image_dir " + input_dir + " --write_json " + output_dir + " --display 0 -render_pose 0 --keypoint_scale 4"
+        command = openpose + " --image_dir " + input_dir + " --write_json " + output_dir + " --display 0 -render_pose 0" # --keypoint_scale 4"
         # Run the command
 
         print("Running OpenPose")

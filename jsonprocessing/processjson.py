@@ -235,19 +235,20 @@ def process_json(input_dir: str, output_dir: str) -> None:
     print("Sets Processed")
 
 def expand_set(line):
-    line = line.split(",")
-    lines = []
-    lines.append(line)
-    lines.append(mirror(line))
-    new_lines = []
-    for l in lines:
-        new_lines.append(scale(l, 0.8))
-        new_lines.append(scale(l, 1.2))
-    lines += new_lines
-    final_lines = []
-    for l in lines:
-        final_lines.append(",".join(map(str, l)))
-    return final_lines
+    return [line]
+    # line = line.split(",")
+    # lines = []
+    # lines.append(line)
+    # lines.append(mirror(line))
+    # # new_lines = []
+    # # for l in lines:
+    # #     new_lines.append(scale(l, 0.8))
+    # #     new_lines.append(scale(l, 1.2))
+    # # lines += new_lines
+    # final_lines = []
+    # for l in lines:
+    #     final_lines.append(",".join(map(str, l)))
+    # return final_lines
 
 def mirror(line):
     return scale(line, -1)

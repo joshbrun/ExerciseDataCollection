@@ -84,4 +84,4 @@ def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     return batch_features, batch_labels
 
 for i in range (50):
-    train(FILE_TRAIN, FILE_TEST, 10)
+    train(FILE_TRAIN, FILE_TEST, 50)

@@ -15,10 +15,11 @@ from json import load
 
 # File and directory locations.
 DATA_DIR = "data"
-VIDEO_FILE = "YoutubeVideos.json"
+VIDEO_FILE = "2YoutubeVideos.json"
 FRAMES_DIR = "frames"
 JSON_DIR = "json"
-TRAINING_DIR = "training"
+# TRAINING_DIR = "training"
+TRAINING_DIR = "validation"
 
 # Paths
 video_path = join(DATA_DIR, VIDEO_FILE)

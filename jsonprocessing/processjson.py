@@ -182,7 +182,7 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
     # Read the sets
     file_name = "exerciseList"
-    file = open(join(input_dir, file_name), 'r')
+    file = open(join("data", file_name), 'r')
     sets = []
 
     for line in file.readlines():
@@ -192,7 +192,7 @@ def process_json(input_dir: str, output_dir: str) -> None:
 
     print("Sets to process: %d" % (len(sets)))
 
-    json_dir = join(input_dir, "json")
+    json_dir = input_dir #join(input_dir, "json")
 
     for data_set in sets:
         set_name_list = data_set.split("/")

@@ -48,7 +48,7 @@ for modifier in MODIFIERS:
     run_openpose(frames_path, json_path)
 
     # Sort the Json files into directories
-    sort_json_files()
+    sort_json_files(json_path)
 
     # Process the Json files into Trainable Normalized vectors
-    process_json(DATA_DIR, output_path)
+    process_json(json_path, output_path)

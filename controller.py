@@ -15,33 +15,40 @@ from json import load
 
 # File and directory locations.
 DATA_DIR = "data"
-VIDEO_FILE = "2YoutubeVideos.json"
+VIDEO_FILE = "YoutubeVideos"
+TRAINING_MODIFIER = "_training"
+VALIDATION_MODIFIER = "_validation"
+VIDEO_DIR = "videos"
 FRAMES_DIR = "frames"
 JSON_DIR = "json"
+OUTPUT_DIR = "output"
 # TRAINING_DIR = "training"
-TRAINING_DIR = "validation"
+# TRAINING_DIR = "validation"
+MODIFIERS = [TRAINING_MODIFIER, VALIDATION_MODIFIER]
 
-# Paths
-video_path = join(DATA_DIR, VIDEO_FILE)
-frames_path = join(DATA_DIR, FRAMES_DIR)
-json_path = join(DATA_DIR, JSON_DIR)
-training_path = join(DATA_DIR, TRAINING_DIR)
+for modifier in MODIFIERS:
+    # Paths
+    videos = join(DATA_DIR, VIDEO_FILE + modifier)
+    videos_path = join(DATA_DIR, VIDEO_DIR + modifier)
+    frames_path = join(DATA_DIR, FRAMES_DIR + modifier)
+    json_path = join(DATA_DIR, JSON_DIR + modifier)
+    output_path = join(DATA_DIR, OUTPUT_DIR + modifier)
 
-# Sequential Pipeline flow
-# Gets the list of videos
-videos = load(open(video_path))['Videos']
+    # Sequential Pipeline flow
+    # Gets the list of videos
+    videos = load(open(videos))['Videos']
 
-# Download the videos
-bulk_download_videos(videos)
+    # Download the videos
+    bulk_download_videos(videos, videos_path)
 
-# Split the videos into frames
-split_videos(videos)
+    # Split the videos into frames
+    split_videos(videos, videos_path, frames_path)
 
-# This requires the bin, include, lib and models in the root dir
-run_openpose(frames_path, json_path)
+    # This requires the bin, include, lib and models in the root dir
+    run_openpose(frames_path, json_path)
 
-# Sort the Json files into directories
-sort_json_files()
+    # Sort the Json files into directories
+    sort_json_files()
 
-# Process the Json files into Trainable Normalized vectors
-process_json(DATA_DIR, training_path)
+    # Process the Json files into Trainable Normalized vectors
+    process_json(DATA_DIR, output_path)

@@ -13,7 +13,7 @@ sys.path.append(join(getcwd(), "utilities"))
 from utilities.fileutilities import check_directory
 
 
-def split_videos(videos):
+def split_videos(videos, input_dir, output_dir):
     """
 
     :param videos:
@@ -27,6 +27,9 @@ def split_videos(videos):
             count += 1
 
     print("Extracting frames from", count, " Clips")
+    print(output_dir)
+
+    check_directory(output_dir)
 
     for video in videos:
         for part in video['parts']:
@@ -34,12 +37,13 @@ def split_videos(videos):
             end_time = round(float(part['endTime']), 3)
             duration = end_time - start_time
 
-            input_name = "data/videos/" + video['identifier'] + ".mkv"
-            output_dir = "data/frames/"
+            input_name = join(input_dir, video['identifier'] + ".mkv")
+            # output_dir = "data/frames/"
             file_name = part['label'] + "_" + video['exercise'] + "_" + video['sex'] + "_" + part['view'] + "_" + part[
                 'name'] + "_" + video['identifier'] + "_" + "%05d.jpg"
-            output = output_dir + file_name
+            output = join(output_dir, file_name)
 
+            
             check_directory("data/frames")
             check_directory("data/framesOP")
             check_directory("data/json")

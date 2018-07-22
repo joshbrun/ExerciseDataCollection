@@ -7,8 +7,8 @@ PATH = os.getcwd()
 
 # Fetch and store Training and Test dataset files
 PATH_DATASET = PATH
-FILE_TRAIN = PATH_DATASET + os.sep + "data/training/hcs_squat_front.csv" # "squat_male_front.csv"
-FILE_TEST = PATH_DATASET + os.sep + "data/validation/hcs_squat_front.csv"  # "tes_fem.csv" 
+FILE_TRAIN = PATH_DATASET + os.sep + "data/output_training/hcs_squat_front.csv" # "squat_male_front.csv"
+FILE_TEST = PATH_DATASET + os.sep + "data/output_validation/hcs_squat_front.csv"  # "tes_fem.csv" 
 
 
 def train(training_file, testing_file, epochs):
@@ -25,7 +25,7 @@ def train(training_file, testing_file, epochs):
     # create classifier that will be used
     classifier = tf.estimator.DNNClassifier(
         feature_columns=feature_columns,                # The input features to our model
-        hidden_units=[50, 50],              # Two layers, each with 10 neurons
+        hidden_units=[50, 25, 10],              # Two layers, each with 10 neurons
         n_classes=2,                                    # Number of classes, currently good or bad
         optimizer=tf.train.AdamOptimizer(1e-4),         # Use Adam optimiser with default setting
         # optimizer=tf.train.ProximalAdagradOptimizer(
@@ -36,6 +36,11 @@ def train(training_file, testing_file, epochs):
         config=my_checkpointing_config,
         model_dir=os.getcwd()+"/modeloutput/")          # Path to where checkpoints etc are stored
 
+
+    # train_spec = tf.estimator.TrainSpec(input_fn=lambda: get_dataset(training_file, True, epochs), max_steps=45000)
+    # eval_spec = tf.estimator.EvalSpec(input_fn=lambda: get_dataset(testing_file, True, 1))
+
+    # tf.estimator.train_and_evaluate(classifier, train_spec, eval_spec)
 
     classifier.train(input_fn=lambda: get_dataset(training_file, True, epochs))
 
@@ -83,5 +88,5 @@ def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     batch_features, batch_labels = iterator.get_next()
     return batch_features, batch_labels
 
-for i in range (50):
-    train(FILE_TRAIN, FILE_TEST, 50)
+for i in range (20):
+    train(FILE_TRAIN, FILE_TEST, 100)

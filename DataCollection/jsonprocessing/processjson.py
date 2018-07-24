@@ -96,10 +96,11 @@ def calculate_hcs(filename, label):
 
     # normalise around the right hip
     for i in range(0, len(key_points)):
-        if i % 3 == 0:
-            key_points[i] -= right_hip_x
-        if i % 3 == 1:
-            key_points[i] -= right_hip_y
+        a=3
+        # if i % 3 == 0:
+        #     key_points[i] -= right_hip_x
+        # if i % 3 == 1:
+        #     key_points[i] -= right_hip_y
     line = ",".join(map(str, key_points))
     line += "," + str(correctness)
 
@@ -208,11 +209,11 @@ def process_json(input_dir: str, output_dir: str) -> None:
             set_dir = json_dir + "/" + label + "/" + data_set
             try:
                 files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
-
+                files.sort()
                 lines = []
                 hcs_lines = []
                 for json_file in files:
-                    # print(jsonFile)
+                    print(json_file)
                     lines.append(calculate_gradients_coarse(set_dir + "/" + json_file, label))
                     hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
 

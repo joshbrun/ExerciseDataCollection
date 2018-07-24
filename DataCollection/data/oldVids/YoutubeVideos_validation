@@ -73,6 +73,66 @@
                 "endTime":"3.95226"
             }                                    
         ]
-      }
+      },
+    {
+      "identifier":"MAl_SLxxeg0",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+        "name":"start",
+        "label":"false",
+        "view":"front",
+        "startTime":"0",
+        "endTime":"2.92"
+        }         
+      ]
+    },
+    {
+      "identifier":"orJBq0nLH_Q",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+        "name":"start",
+        "label":"false",
+        "view":"front",
+        "startTime":"0",
+        "endTime":"3.76"
+        }         
+      ]
+    },
+{
+      "identifier":"8-gkC8gPLM8",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+        "name":"start",
+        "label":"true",
+        "view":"front",
+        "startTime":"0",
+        "endTime":"1.88"
+        }          
+      ]
+    },
+    {
+      "identifier":"Ai0pz3o_Qx0",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+        "name":"start",
+        "label":"true",
+        "view":"front",
+        "startTime":"0",
+        "endTime":"3.18"
+        }          
+      ]
+    }
   ]
 }

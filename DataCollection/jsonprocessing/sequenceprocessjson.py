@@ -75,30 +75,28 @@ def process_json(input_dir: str, output_dir: str) -> None:
     json_dir = input_dir #join(input_dir, "json")
 
     for data_set in sets:
-        set_name_list = data_set.split("/")
-
-        agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
-        output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
+        lines_dict = {}
 
         for label in ["true", "false"]:
             set_dir = json_dir + "/" + label + "/" + data_set
-            print("c")
             try:
                 files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
-                print("a")
                 files.sort()
-                lines = []
                 for json_file in files:
-                    print("b")
-                    lines.append(calculate_hcs(set_dir + "/" + json_file, label))
-
-                # for line in lines:
-                #     if not (line == "[]"):
-                #         output_agg_file.write(line + "\n")
+                    print(json_file)
+                    id = json_file[0:10]
+                    if "00001" in json_file:
+                        lines_dict[id] = [calculate_hcs(set_dir + "/" + json_file, label)]
+                    else:
+                        lines_dict[id].append(calculate_hcs(set_dir + "/" + json_file, label))
 
             except FileNotFoundError as e:
                 print(e)
                 continue
+                
+        for id in lines_dict:
+            output_agg_file = open(output_dir + "/" + id + ".csv", "a")
+            for line in lines_dict[id]:
+                output_agg_file.write(line + "\n")
 
-        # output_file.close()
     print("Sets Processed")

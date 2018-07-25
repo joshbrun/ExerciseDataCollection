@@ -90,7 +90,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
           client_videos.write(json.dumps(videos_dict))
 
       # Run the computation pipeline, (Similar to the training pipeline)
-      # self.process_pipeline()
+      self.process_pipeline()
 
 
       # Return the response
@@ -100,6 +100,34 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
       self.end_headers()
       self.wfile.write(bytes(message, "utf8"))
 
+  def process_pipeline(self):
+      """
+      The process pipeline which takes the clients video,
+      Breaks it into frames
+      Runs openpose on all the frames
+      Processes the json output of openpose
+      Classify each json frame
+      analysis the results
+      return the results as a response to the client.
+      """
+
+      # Check the clients file exists
+      if ospath.isfile("data/input/out.mp4"):
+
+          # Extract the frames
+          with open("data/clientVideos.json", 'r') as videos_file:
+            # split_videos(json.load(videos_file)['Videos'])
+            pass
+
+          # Run Open Pose on the frames
+
+          # Process the skeletal data
+
+          # Run Each frame against the model
+
+          # Analysis the results
+
+          # Form the response
 
   def get_file_data(self, form):
       """

@@ -20,6 +20,8 @@ import urllib
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+from openpose.openPose import run_openpose_on_video
+
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -48,9 +50,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         :return:
         """
         # Check directorys all exist
-        check_directory("data")
-        check_directory("data/input")
-        check_directory("data/output")
+        check_directory("server")
+        check_directory("server/input")
+        check_directory("server/output")
 
         f = StringIO()
         fm = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
@@ -69,7 +71,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         start = (data_values['startTime'])
         end = (data_values['finishTime'])
 
-        video_path = os.path.join(os.getcwd(), "data/clientVideos.json")
+        video_path = os.path.join(os.getcwd(), "server/clientVideos.json")
 
         # Currently only one user is expected at once, so just create a new dictionary
         videos_dict = {"Videos": []}
@@ -113,12 +115,15 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         """
 
         # Check the clients file exists
+
+
+
         if ospath.isfile("data/input/out.mp4"):
             # Extract the frames
             # This is redundant currently, done directly by openpose
 
             # Run Open Pose on the frames
-
+            run_openpose_on_video(vid, out, True)
             # Process the skeletal data
 
             # Run Each frame against the model
@@ -137,13 +142,13 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         """
         for value in form:
             print(value)
-        fn = form.getvalue((os.getcwd()), "data/input/out.mp4")
+        fn = form.getvalue((os.getcwd()), "server/input/out.mp4")
         print(fn)
         open(fn, 'w').close()
 
         with open(fn, 'wb') as out:
             out.write(form['file'].file.read())
-        return "data/input/out.mp4"
+        return "server/input/out.mp4"
 
 
 def run():

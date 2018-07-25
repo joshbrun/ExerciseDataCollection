@@ -70,13 +70,12 @@ def run_openpose(input_dir, output_dir, keypoint_scale):
         print("ERROR: openpose is not in the required location.")
         sys.exit()
 
-def run_openpose_on_video(video_path, output_dir, keypoint_scale, create_skeletial_overlayed_video):
+def run_openpose_on_video(video_path, output_dir, create_skeletial_overlayed_video):
     """
     Runs openpose directly against a video, extracting the json frames, but also creates an optional video with the 
     skeletal mapping overlapped.
     :param video_path: The path to the video, Should be full path, so join(os.path.getcwd(), path)
     :param output_dir: The directory to store the json output, (Will be stored in subdir /json)
-    :param keypoint_scale:
     :param create_skeletial_overlayed_video: Boolean to determine if a video is requested, (Will be stored in /video)
     """
     if check_openpose_directories():
@@ -101,7 +100,7 @@ def run_openpose_on_video(video_path, output_dir, keypoint_scale, create_skeleti
         os.path.join("..", output_dir)
 
         # keypoint_scale 4 normalises between 1 and -1
-        command = openpose + " --video " + video_path + " --write_json " + output_dir + " --write_video "+os.path.join(output_dir,'video','out.avi')+" --display 0 --keypoint_scale " + str(keypoint_scale)
+        command = openpose + " --video " + video_path + " --write_json " + output_dir + " --write_video "+os.path.join(output_dir,'video','out.avi')+" --display 0 "
 
         # Run the command
 

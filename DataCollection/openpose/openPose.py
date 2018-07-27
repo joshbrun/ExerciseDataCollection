@@ -32,7 +32,6 @@ def check_openpose_directories():
             print("./openpose/models Not found.")
             return False
         else:
-            print("All openpose directories have been found.")
             return True
 
 
@@ -93,9 +92,7 @@ def run_openpose_on_video(id, video_path, output_dir, create_skeletial_overlayed
 
         # Run the command
 
-        print("Running OpenPose")
-        print("Video:", video_path)
-        print("Output:", output_dir)
+        print("\nRunning OpenPose")
 
         # cd into the openpose directory
         os.chdir(os.path.join(os.getcwd(), "openpose"))

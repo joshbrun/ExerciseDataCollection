@@ -4,6 +4,7 @@ from shutil import copyfileobj
 import os
 import cgi
 import cgitb;
+import uuid
 
 cgitb.enable(format="text")
 from wsgiref.util import FileWrapper
@@ -22,6 +23,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from openpose.openPose import run_openpose_on_video
 from utilities.fileutilities import check_directory
+from jsonprocessing.processjson import process_json_for_server as process_json
+from jsonprocessing.sequenceprocessjson import process_json_for_server as process_sequencial_json
 
 
 # HTTPRequestHandler class
@@ -52,13 +55,15 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         """
         # Check directorys all exist
         check_directory("server")
-        check_directory("server/input")
-        check_directory("server/output")
+        check_directory("server/data/input")
+        check_directory("server/data/output")
+
+        id = str(uuid.uuid4())
 
         f = StringIO()
         fm = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
         if "file" in fm:
-            self.get_file_data(fm)
+            self.get_file_data(fm, id)
         else:
             print("ERROR")
             Exception("BAD")
@@ -72,30 +77,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         start = (data_values['startTime'])
         end = (data_values['finishTime'])
 
-        video_path = os.path.join(os.getcwd(), "server/clientVideos.json")
-
-        # Currently only one user is expected at once, so just create a new dictionary
-        videos_dict = {"Videos": []}
-
-        videos_dict['Videos'].append({
-            "identifier": "out",
-            "exercise": exercise,
-            "sex": gender,
-            "local": 'true',
-            "parts": [{
-                "name": "full",
-                "label": "client",
-                "view": view,
-                "startTime": start,
-                "endTime": end
-            }]
-        })
-
-        with open(video_path, "w") as client_videos:
-            client_videos.write(json.dumps(videos_dict))
-
         # Run the computation pipeline, (Similar to the training pipeline)
-        self.process_pipeline()
+        self.process_pipeline(exercise, gender, view, id)
 
         # Return the response
         message = "Video was bad"
@@ -104,7 +87,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes(message, "utf8"))
 
-    def process_pipeline(self):
+    def process_pipeline(self, exercise, gender, view, id):
         """
         The process pipeline which takes the clients video,
         Breaks it into frames
@@ -117,16 +100,31 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         # Check the clients file exists
 
+        check_directory("server")
+        check_directory("server/data")
+        check_directory("server/data/input")
+        check_directory("server/data/output")
 
-
-        if os.path.isfile("data/input/out.mp4"):
+        # Run the server, when py server.py is called
+        # run()
+        if os.path.isfile("server/data/input/"+id+".mp4"):
             # Extract the frames
             # This is redundant currently, done directly by openpose
 
+            output_dir = "server/data/output"
             # Run Open Pose on the frames
-            run_openpose_on_video("server/data/input/"+id+".mp4", "server/data/output", True)
-            # Process the skeletal data
+            run_openpose_on_video(id, "../server/data/input/", "../" + output_dir, True)
 
+            # Create json Exercise file
+
+            parts = ['all']
+            with open('server/data/output/' + id + '/' + id + '.json', 'w') as outfile:
+                data = ["/server/" + exercise + "/" + gender + "/" + view + "/" + "all"]
+                json.dump(data, outfile)
+
+            # Process the skeletal data
+            process_json(os.path.join(output_dir, id), os.path.join(output_dir, id, "processedjson"), id)
+            process_sequencial_json(os.path.join(output_dir, id), os.path.join(output_dir, id, "processedjson"), id)
             # Run Each frame against the model
 
             # Analysis the results
@@ -134,22 +132,20 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             # Form the response
             pass
 
-    def get_file_data(self, form):
+    def get_file_data(self, form, id):
         """
         Gets the file data from the request.
         this request form contains the name, gender, exercise and view of the request.
         :param form: The data set within the request.
         :return: The path to the request input video.
         """
-        for value in form:
-            print(value)
-        fn = form.getvalue((os.getcwd()), "server/input/out.mp4")
-        print(fn)
+        fn = form.getvalue((os.getcwd()), "server/data/input/"+id+".mp4")
         open(fn, 'w').close()
 
         with open(fn, 'wb') as out:
             out.write(form['file'].file.read())
-        return "server/input/out.mp4"
+        return "server/data/input/"+id+".mp4"
+
 
 
 def run():
@@ -166,26 +162,5 @@ def run():
     print('Server is running.\n')
     httpd.serve_forever()
 
-print("here")
-print(os.getcwd())
-check_directory("server")
-check_directory("server/data")
-check_directory("server/data/input")
-check_directory("server/data/output")
+run()
 
-# Run the server, when py server.py is called
-# run()
-if os.path.isfile("server/data/input/qwertyuiop.mp4"):
-            # Extract the frames
-            # This is redundant currently, done directly by openpose
-
-            # Run Open Pose on the frames
-            run_openpose_on_video('qwertyuiop', "../server/data/input/", "../server/data/output/", True)
-            # Process the skeletal data
-
-            # Run Each frame against the model
-
-            # Analysis the results
-
-            # Form the response
-            pass

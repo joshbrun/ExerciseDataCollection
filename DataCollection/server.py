@@ -21,6 +21,7 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from openpose.openPose import run_openpose_on_video
+from utilities.fileutilities import check_directory
 
 
 # HTTPRequestHandler class
@@ -118,12 +119,12 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
 
 
-        if ospath.isfile("data/input/out.mp4"):
+        if os.path.isfile("data/input/out.mp4"):
             # Extract the frames
             # This is redundant currently, done directly by openpose
 
             # Run Open Pose on the frames
-            run_openpose_on_video(vid, out, True)
+            run_openpose_on_video("server/data/input/"+id+".mp4", "server/data/output", True)
             # Process the skeletal data
 
             # Run Each frame against the model
@@ -165,6 +166,26 @@ def run():
     print('Server is running.\n')
     httpd.serve_forever()
 
+print("here")
+print(os.getcwd())
+check_directory("server")
+check_directory("server/data")
+check_directory("server/data/input")
+check_directory("server/data/output")
 
 # Run the server, when py server.py is called
-run()
+# run()
+if os.path.isfile("server/data/input/qwertyuiop.mp4"):
+            # Extract the frames
+            # This is redundant currently, done directly by openpose
+
+            # Run Open Pose on the frames
+            run_openpose_on_video('qwertyuiop', "../server/data/input/", "../server/data/output/", True)
+            # Process the skeletal data
+
+            # Run Each frame against the model
+
+            # Analysis the results
+
+            # Form the response
+            pass

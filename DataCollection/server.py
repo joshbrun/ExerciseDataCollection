@@ -3,8 +3,15 @@
 from shutil import copyfileobj
 import os
 import cgi
-import cgitb;
+import cgitb
 import uuid
+import re
+import time
+
+from openpose.openPose import run_openpose_on_video
+from utilities.fileutilities import check_directory
+from jsonprocessing.processjson import process_json_for_server as process_json
+from jsonprocessing.sequenceprocessjson import process_json_for_server as process_sequencial_json
 
 cgitb.enable(format="text")
 from wsgiref.util import FileWrapper
@@ -21,11 +28,8 @@ import urllib
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from openpose.openPose import run_openpose_on_video
-from utilities.fileutilities import check_directory
-from jsonprocessing.processjson import process_json_for_server as process_json
-from jsonprocessing.sequenceprocessjson import process_json_for_server as process_sequencial_json
 
+TOKEN_EXPIRY = 160
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -43,6 +47,64 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         """
         self.send_header("Access-Control-Allow-Origin", "*")
 
+    # GET
+    def do_GET(self):
+
+        current_time = time.time()
+        global token_dict
+
+        if None != re.search('/api/token', self.path):
+            # Send response status code
+            self.send_response(200)
+            # Send headers
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            # Send message back to client
+            key = str(uuid.uuid4())
+            # value is the expiry of the token
+            value = current_time + TOKEN_EXPIRY
+            # add the uuid and the current time into the token dictionary
+            add_token_to_dict(value, key)
+            # Write content as utf-8 data
+            self.wfile.write(bytes(key, "utf8"))
+            return
+
+        elif None != re.search('/api/*', self.path):
+            token = self.path.split('/')[-1]
+
+            # check expiry vs the dictionary
+            value = {}
+            try:
+                value = token_dict[token]
+
+            except Exception as e:
+                self.send_response(403)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                message = "Invalid token"
+                self.wfile.write(str.encode(message))
+                return
+
+            if(value['expiry'] <= current_time):
+                self.send_response(403)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                message = "Token has expired"
+                self.wfile.write(str.encode(message))
+                return
+
+            self.send_response(403)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            # Send message back to client
+            status = '70'
+            message = json.dumps({'token': token, 'status': status})
+            # Write content as utf-8 data
+            self.wfile.write(str.encode(message))
+            return
+
     # POST
     def do_POST(self):
         """
@@ -53,23 +115,45 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         Note: this server is currently not able to handle more than 1 request at a time.
         :return:
         """
+
+        current_time = time.time()
+
         # Check directorys all exist
         check_directory("server")
         check_directory("server/data/input")
         check_directory("server/data/output")
 
-        id = str(uuid.uuid4())
-
         f = StringIO()
         fm = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
+
+        # Video at out.mp4
+        data_values = json.loads(fm.getvalue('data'))
+        token = data_values['token']
+
         if "file" in fm:
-            self.get_file_data(fm, id)
+            self.get_file_data(fm, token)
         else:
             print("ERROR")
             Exception("BAD")
 
-        # Video at out.mp4
-        data_values = json.loads(fm.getvalue('data'))
+        try:
+            value = token_dict[token]
+
+        except Exception as e:
+            self.send_response(403)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            message = "Invalid token"
+            self.wfile.write(str.encode(message))
+            return
+
+        if (value['expiry'] <= current_time):
+            self.send_response(403)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            message = "Token has expired"
+            self.wfile.write(str.encode(message))
+            return
 
         exercise = (data_values['exercise'])
         view = (data_values['view'])
@@ -78,7 +162,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         end = (data_values['finishTime'])
 
         # Run the computation pipeline, (Similar to the training pipeline)
-        self.process_pipeline(exercise, gender, view, id)
+        self.process_pipeline(exercise, gender, view, token)
 
         # Return the response
         message = "Video was bad"
@@ -107,7 +191,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         # Run the server, when py server.py is called
         # run()
-        if os.path.isfile("server/data/input/"+id+".mp4"):
+        if os.path.isfile("server/data/input/" + id + ".mp4"):
             # Extract the frames
             # This is redundant currently, done directly by openpose
 
@@ -139,13 +223,12 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         :param form: The data set within the request.
         :return: The path to the request input video.
         """
-        fn = form.getvalue((os.getcwd()), "server/data/input/"+id+".mp4")
+        fn = form.getvalue((os.getcwd()), "server/data/input/" + id + ".mp4")
         open(fn, 'w').close()
 
         with open(fn, 'wb') as out:
             out.write(form['file'].file.read())
-        return "server/data/input/"+id+".mp4"
-
+        return "server/data/input/" + id + ".mp4"
 
 
 def run():
@@ -154,6 +237,7 @@ def run():
     Note that this server uses relative links so it must be run in the directory containing server.py
     :return:
     """
+
     print('Starting the exercise analysis server:')
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access
@@ -162,5 +246,13 @@ def run():
     print('Server is running.\n')
     httpd.serve_forever()
 
-run()
 
+def add_token_to_dict(value, key):
+    global token_dict
+    print('\nAdding token to dict')
+    print(token_dict)
+    token_dict[key] = {'expiry': value, 'status': 0}
+
+
+token_dict = {}
+run()

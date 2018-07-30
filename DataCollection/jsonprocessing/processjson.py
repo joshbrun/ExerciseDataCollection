@@ -82,6 +82,8 @@ def calculate_hcs(filename, label):
     correctness = 0
     if label == "true":
         correctness = 1
+    elif label == "server":
+        correctness = '?'
 
     line = ""
     file = open(filename, 'r')
@@ -118,6 +120,8 @@ def calculate_gradients_coarse(filename, label):
     correctness = 0
     if label == "true":
         correctness = 1
+    elif label == "server":
+        correctness = '?'
 
     line = ""
     file = open(filename, 'r')
@@ -170,7 +174,7 @@ def calculate_gradients_coarse(filename, label):
 
     return line
 
-def process_json(input_dir: str, output_dir: str) -> None:
+def process_json(input_dir, output_dir):
     """
     Processes the Json files into trainable data sets.
     :param input_dir: The location of the Json data.
@@ -205,7 +209,7 @@ def process_json(input_dir: str, output_dir: str) -> None:
         output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
         hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
 
-        for label in ["true", "false"]:
+        for label in ['true', 'false']:
             set_dir = json_dir + "/" + label + "/" + data_set
             try:
                 files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
@@ -231,6 +235,66 @@ def process_json(input_dir: str, output_dir: str) -> None:
             except FileNotFoundError as e:
                 print(e)
                 continue
+
+        output_file.close()
+    print("Sets Processed")
+
+def process_json_for_server(input_dir, output_dir, id):
+    """
+        Processes the Json files into trainable data sets.
+        :param input_dir: The location of the Json data.
+        :param output_dir: The location of the Training directory.
+        """
+    expanding_set = False
+    print("\nConverting the separate Json files into a Trainable Vector Set")
+    check_directory(output_dir)
+    check_directory(input_dir)
+
+    # Read the sets
+    file = open(join(input_dir, id+".json"), 'r')
+    sets = []
+
+    for line in file.readlines():
+        if not line[:-2] in sets:
+            sets.append(line[:-2])
+    file.close()
+
+    print("Sets to process: %d" % (len(sets)))
+
+    json_dir = input_dir  # join(input_dir, "json")
+
+    for data_set in sets:
+        set_name_list = data_set.split("/")
+        output_file_name = set_name_list[1] + "_" + set_name_list[2] + "_" + set_name_list[3] + "_" + set_name_list[4]
+        output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
+        hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
+        agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
+        output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
+        hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
+
+        for label in ['server']:
+            set_dir = json_dir +'/json'
+
+            files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
+            files.sort()
+            lines = []
+            hcs_lines = []
+            for json_file in files:
+                lines.append(calculate_gradients_coarse(set_dir + "/" + json_file, label))
+                hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
+
+            for line in lines:
+                if not (line == "[]"):
+                    output_file.write(line + "\n")
+                    output_agg_file.write(line + "\n")
+
+            for line in hcs_lines:
+                for ex_line in expand_set(line):
+                    if not (ex_line == "[]"):
+                        hcs_output_file.write(ex_line + "\n")
+                        hcs_output_agg_file.write(ex_line + "\n")
+
+
 
         output_file.close()
     print("Sets Processed")

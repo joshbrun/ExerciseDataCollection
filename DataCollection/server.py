@@ -94,7 +94,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(str.encode(message))
                 return
 
-            self.send_response(403)
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
@@ -167,9 +167,11 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         # Return the response
         message = "Video was bad"
         self.send_response(200)
-        self.send_header("content-type", "application/html")
+        self.send_header("content-type", "multipart/form-data")
         self.end_headers()
-        self.wfile.write(bytes(message, "utf8"))
+
+        with open('server/data/output/'+token+"/video/"+token+".avi", 'r') as f:
+            self.wfile.write(f)
 
     def process_pipeline(self, exercise, gender, view, id):
         """

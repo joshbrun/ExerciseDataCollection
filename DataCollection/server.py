@@ -27,6 +27,7 @@ except ImportError:
 import urllib
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 
 
 TOKEN_EXPIRY = 160
@@ -52,7 +53,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         current_time = time.time()
         global token_dict
-        global video_dict
 
         if None != re.search('/api/token', self.path):
             # Send response status code
@@ -100,9 +100,11 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             # Send message back to client
-            status = '70'
-            check_directory("server/data/output/json")
-
+            global video_dict
+            expected_frames = (float(video_dict[token][1]) - float(video_dict[token][0])) * 30
+            check_directory("server/data/output/" + token + "/json")
+            processed_frames = os.listdir("server/data/output/" + token + "/json")
+            status = len(processed_frames) / expected_frames
 
             message = json.dumps({'token': token, 'status': status})
             # Write content as utf-8 data
@@ -136,7 +138,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         data_values = json.loads(fm.getvalue('data'))
         token = data_values['token']
         start_time = data_values['startTime']
-        end_time = data_values['endTime']
+        end_time = data_values['finishTime']
 
         if "file" in fm:
             self.get_file_data(fm, token)
@@ -241,6 +243,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             out.write(form['file'].file.read())
         return "server/data/input/" + id + ".mp4"
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+    pass
 
 def run():
     """
@@ -253,7 +258,7 @@ def run():
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access
     server_address = ('192.168.1.76', 8081)
-    httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
+    httpd = ThreadedHTTPServer(server_address, testHTTPServer_RequestHandler)
     print('Server is running.\n')
     httpd.serve_forever()
 

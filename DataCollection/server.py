@@ -52,6 +52,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         current_time = time.time()
         global token_dict
+        global video_dict
 
         if None != re.search('/api/token', self.path):
             # Send response status code
@@ -100,6 +101,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
             # Send message back to client
             status = '70'
+            check_directory("server/data/output/json")
+
+
             message = json.dumps({'token': token, 'status': status})
             # Write content as utf-8 data
             self.wfile.write(str.encode(message))
@@ -115,6 +119,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         Note: this server is currently not able to handle more than 1 request at a time.
         :return:
         """
+        global token_dict
+        global video_dict
 
         current_time = time.time()
 
@@ -129,6 +135,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         # Video at out.mp4
         data_values = json.loads(fm.getvalue('data'))
         token = data_values['token']
+        start_time = data_values['startTime']
+        end_time = data_values['endTime']
 
         if "file" in fm:
             self.get_file_data(fm, token)
@@ -138,6 +146,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         try:
             value = token_dict[token]
+            video_dict[token] = [start_time, end_time]
 
         except Exception as e:
             self.send_response(403)
@@ -257,4 +266,5 @@ def add_token_to_dict(value, key):
 
 
 token_dict = {}
+video_dict = {}
 run()

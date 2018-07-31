@@ -170,8 +170,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.send_header("content-type", "multipart/form-data")
         self.end_headers()
 
-        with open('server/data/output/'+token+"/video/"+token+".avi", 'r') as f:
-            self.wfile.write(f)
+        with open('server/data/output/'+token+"/video/"+token+".avi", 'rb') as f:
+            self.wfile.write(f.read())
 
     def process_pipeline(self, exercise, gender, view, id):
         """
@@ -243,7 +243,7 @@ def run():
     print('Starting the exercise analysis server:')
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access
-    server_address = ('127.0.0.1', 8081)
+    server_address = ('192.168.1.76', 8081)
     httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
     print('Server is running.\n')
     httpd.serve_forever()

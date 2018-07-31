@@ -31,24 +31,25 @@ def calculate_hcs(filename, label):
     file = open(filename, 'r')
     lines = file.readline()
     people = json.loads(lines)['people']
+    
+    if len(people) > 0:
+        # If there are more than one person in the frame only use the first.
+        key_points = people[0]['pose_keypoints_2d']
 
-    # If there are more than one person in the frame only use the first.
-    key_points = people[0]['pose_keypoints_2d']
+        right_hip_x = key_points[8 * 3]
+        right_hip_y = key_points[8 * 3 + 1]
 
-    right_hip_x = key_points[8 * 3]
-    right_hip_y = key_points[8 * 3 + 1]
+        # normalise around the right hip
+        for i in range(0, len(key_points)):
+            a=3
+            # if i % 3 == 0:
+            #     key_points[i] -= right_hip_x
+            # if i % 3 == 1:
+            #     key_points[i] -= right_hip_y
+        line = ",".join(map(str, key_points))
+        line += "," + str(correctness)
 
-    # normalise around the right hip
-    for i in range(0, len(key_points)):
-        a=3
-        # if i % 3 == 0:
-        #     key_points[i] -= right_hip_x
-        # if i % 3 == 1:
-        #     key_points[i] -= right_hip_y
-    line = ",".join(map(str, key_points))
-    line += "," + str(correctness)
-
-    file.close()
+        file.close()
 
     return line
 

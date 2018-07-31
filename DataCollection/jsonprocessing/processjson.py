@@ -90,23 +90,24 @@ def calculate_hcs(filename, label):
     lines = file.readline()
     people = json.loads(lines)['people']
 
-    # If there are more than one person in the frame only use the first.
-    key_points = people[0]['pose_keypoints_2d']
+    if len(people) > 0:
+        # If there are more than one person in the frame only use the first.
+        key_points = people[0]['pose_keypoints_2d']
 
-    right_hip_x = key_points[8 * 3]
-    right_hip_y = key_points[8 * 3 + 1]
+        right_hip_x = key_points[8 * 3]
+        right_hip_y = key_points[8 * 3 + 1]
 
-    # normalise around the right hip
-    for i in range(0, len(key_points)):
-        a=3
-        # if i % 3 == 0:
-        #     key_points[i] -= right_hip_x
-        # if i % 3 == 1:
-        #     key_points[i] -= right_hip_y
-    line = ",".join(map(str, key_points))
-    line += "," + str(correctness)
+        # normalise around the right hip
+        for i in range(0, len(key_points)):
+            a=3
+            # if i % 3 == 0:
+            #     key_points[i] -= right_hip_x
+            # if i % 3 == 1:
+            #     key_points[i] -= right_hip_y
+        line = ",".join(map(str, key_points))
+        line += "," + str(correctness)
 
-    file.close()
+        file.close()
 
     return line
 
@@ -128,49 +129,50 @@ def calculate_gradients_coarse(filename, label):
     lines = file.readline()
     people = json.loads(lines)['people']
 
-    # If there are more than one person in the frame only use the first.
-    key_points = people[0]['pose_keypoints_2d']
+    if len(people) > 0:
+        # If there are more than one person in the frame only use the first.
+        key_points = people[0]['pose_keypoints_2d']
 
-    for key in JOINTS_MAPPING:
-        part_a = JOINTS_MAPPING[key][0]
-        part_b = JOINTS_MAPPING[key][1]
+        for key in JOINTS_MAPPING:
+            part_a = JOINTS_MAPPING[key][0]
+            part_b = JOINTS_MAPPING[key][1]
 
-        index_a = part_a * 3
-        x1 = key_points[index_a]
-        y1 = key_points[index_a + 1]
-        c1 = key_points[index_a + 2]
+            index_a = part_a * 3
+            x1 = key_points[index_a]
+            y1 = key_points[index_a + 1]
+            c1 = key_points[index_a + 2]
 
-        index_b = part_b * 3
-        x2 = key_points[index_b]
-        y2 = key_points[index_b + 1]
-        c2 = key_points[index_b + 2]
+            index_b = part_b * 3
+            x2 = key_points[index_b]
+            y2 = key_points[index_b + 1]
+            c2 = key_points[index_b + 2]
 
-        if x2 == x1 and x2 == 0:
-            # point doesnt exist
-            line += ",%0.4d,%0.3d,%0.3d" % (0, 0, 0)
-        elif y2 == y1 and y2 == 0:
-            # point doesnt exist
-            line += ",%.4f,%.3f,%.3f" % (0, 0, 0)
+            if x2 == x1 and x2 == 0:
+                # point doesnt exist
+                line += ",%0.4d,%0.3d,%0.3d" % (0, 0, 0)
+            elif y2 == y1 and y2 == 0:
+                # point doesnt exist
+                line += ",%.4f,%.3f,%.3f" % (0, 0, 0)
 
-        elif x2 == x1 and y2 == y1:
-            # points are the same
-            line += ",%.4f,%.3f,%.3f" % (0, 0, 0)
+            elif x2 == x1 and y2 == y1:
+                # points are the same
+                line += ",%.4f,%.3f,%.3f" % (0, 0, 0)
 
-        elif x2 == x1:
-            # gradient is infinite
-            g = sys.maxsize
-            line += ",%.4f,%.3f,%.3f" % (g, 0, 0)
-        elif y2 == y1:
-            # gradient is 0
-            line += ",%.4f,%.3f,%.3f" % (0, c1, c2)
-        else:
-            g = (float(y2) - float(y1)) / (float(x2) - float(x1))
-            line += ",%.4f,%.3f,%.3f" % (g, c1, c2)
+            elif x2 == x1:
+                # gradient is infinite
+                g = sys.maxsize
+                line += ",%.4f,%.3f,%.3f" % (g, 0, 0)
+            elif y2 == y1:
+                # gradient is 0
+                line += ",%.4f,%.3f,%.3f" % (0, c1, c2)
+            else:
+                g = (float(y2) - float(y1)) / (float(x2) - float(x1))
+                line += ",%.4f,%.3f,%.3f" % (g, c1, c2)
 
-    if not line == "":
-        line = line[1:] + "," + str(correctness)
+        if not line == "":
+            line = line[1:] + "," + str(correctness)
 
-    file.close()
+        file.close()
 
     return line
 
@@ -222,13 +224,13 @@ def process_json(input_dir, output_dir):
                     hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
 
                 for line in lines:
-                    if not (line == "[]"):
+                    if not (line == ""):
                         output_file.write(line + "\n")
                         output_agg_file.write(line + "\n")
                 
                 for line in hcs_lines:
                     for ex_line in expand_set(line):
-                        if not (ex_line == "[]"):
+                        if not (ex_line == ""):
                             hcs_output_file.write(ex_line + "\n")
                             hcs_output_agg_file.write(ex_line + "\n")
 
@@ -284,13 +286,13 @@ def process_json_for_server(input_dir, output_dir, id):
                 hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
 
             for line in lines:
-                if not (line == "[]"):
+                if not (line == ""):
                     output_file.write(line + "\n")
                     output_agg_file.write(line + "\n")
 
             for line in hcs_lines:
                 for ex_line in expand_set(line):
-                    if not (ex_line == "[]"):
+                    if not (ex_line == ""):
                         hcs_output_file.write(ex_line + "\n")
                         hcs_output_agg_file.write(ex_line + "\n")
 

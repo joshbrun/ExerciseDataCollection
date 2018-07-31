@@ -30,7 +30,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 
 
-TOKEN_EXPIRY = 160
+TOKEN_EXPIRY = 16000
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -99,12 +99,20 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            # Send message back to client
-            global video_dict
-            expected_frames = (float(video_dict[token][1]) - float(video_dict[token][0])) * 30
-            check_directory("server/data/output/" + token + "/json")
-            processed_frames = os.listdir("server/data/output/" + token + "/json")
-            status = len(processed_frames) / expected_frames
+            status = 1.0
+            try:
+                # Send message back to client
+                global video_dict
+                expected_frames = (float(video_dict[token][1]) - float(video_dict[token][0])) * 30
+                check_directory("server/data/output/" + token + "/json")
+                processed_frames = os.listdir("../server/data/output/" + token + "/json")
+                status = 1.0 * len(processed_frames) / expected_frames
+                print(str(len(processed_frames)))
+                print(str(expected_frames))
+                print(str(status))
+            
+            except Exception as e:
+                pass
 
             message = json.dumps({'token': token, 'status': status})
             # Write content as utf-8 data

@@ -180,6 +180,21 @@
         "endTime":"3.76"
         }         
       ]
+    },
+    {
+      "identifier":"37lJ1IMdYYo",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+          "name":"start",
+          "label":"false",
+          "view":"front",
+          "startTime":"0",
+          "endTime":"3.268216"
+          }         
+      ]
     }
   ]
 }

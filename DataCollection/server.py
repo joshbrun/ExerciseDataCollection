@@ -7,6 +7,8 @@ import cgitb
 import uuid
 import re
 import time
+import boto3
+import sys
 
 from openpose.openPose import run_openpose_on_video
 from utilities.fileutilities import check_directory
@@ -183,13 +185,26 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         # Run the computation pipeline, (Similar to the training pipeline)
         self.process_pipeline(exercise, gender, view, token)
 
+        os.system("ffmpeg.exe -i server/data/output/"+token+"/video/"+token+".avi server/data/output/"+token+"/video/"+token+".mp4")
+
+        AWS_ACCESS_KEY_ID = 'AKIAI2K6T3MJ24TCDFPA'
+        AWS_SECRET_ACCESS_KEY = '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'
+
+        bucket_name = 'p4p-videos'
+
+        filename = 'server/data/output/'+token+"/video/"+token+".mp4"
+
+        s3 = boto3.resource('s3')
+        s3.Bucket(bucket_name).upload_file(filename, token)
+        s3.ObjectAcl(bucket_name, token).put( ACL='public-read')
+
         # Return the response
         message = "Video was bad"
         self.send_response(200)
-        self.send_header("content-type", "multipart/form-data")
+        self.send_header("content-type", "octet/stream")
         self.end_headers()
 
-        with open('server/data/output/'+token+"/video/"+token+".avi", 'rb') as f:
+        with open('server/data/output/'+token+"/video/"+token+".mp4", 'rb') as f:
             self.wfile.write(f.read())
 
     def process_pipeline(self, exercise, gender, view, id):
@@ -265,7 +280,7 @@ def run():
     print('Starting the exercise analysis server:')
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access
-    server_address = ('192.168.1.76', 8081)
+    server_address = ('127.0.0.1', 8081)
     httpd = ThreadedHTTPServer(server_address, testHTTPServer_RequestHandler)
     print('Server is running.\n')
     httpd.serve_forever()

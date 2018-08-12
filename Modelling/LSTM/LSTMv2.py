@@ -23,12 +23,13 @@ def load_dir(set_dir):
 
         # generate sequences with windows
         data_gen = TimeseriesGenerator(x, y,
-                                    length=50, sampling_rate=1,
+                                    length=48, sampling_rate=8,
                                     batch_size=1)
 
         for i in range(len(data_gen)):
             # print(data_gen[i][0][0])
             x_data_sets.append(data_gen[i][0][0])
+            # print(data_gen[i][0][0])
             y_data_sets.append(data_gen[i][1][0])
 
     x_data_sets = np.array(x_data_sets)
@@ -38,9 +39,10 @@ def load_dir(set_dir):
 
 x, y = load_dir("./data/output_training/")
 val_x, val_y = load_dir("./data/output_validation/")
+print(x)
 
 model = Sequential()
-model.add(LSTM(250, input_shape=(50, 50), dropout=0.50, return_sequences=True))
+model.add(LSTM(250, input_shape=(6, 50), dropout=0.50, return_sequences=True))
 model.add(LSTM(250, dropout=0.40, return_sequences=True))
 model.add(LSTM(250, dropout=0.30))
 model.add(Dense(1, activation='relu'))

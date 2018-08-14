@@ -2,7 +2,7 @@
   "Videos":
   [
     {
-      "identifier":"DscScZDUkhQ",
+      "identifier":"orJBq0nLH_Q",
       "exercise":"squat",
       "sex":"male",
       "local":"false",
@@ -12,53 +12,68 @@
         "label":"false",
         "view":"front",
         "startTime":"0",
-        "endTime":"3.36"
-        }          
-      ]
-    },
-    {
-      "identifier":"H4TwSSNBCHw",
-      "exercise":"squat",
-      "sex":"male",
-      "local":"false",
-      "parts":[
-        {
-        "name":"start",
-        "label":"false",
-        "view":"front",
-        "startTime":"0",
-        "endTime":"2.99"
+        "endTime":"3.76"
         }         
       ]
     },
     {
-      "identifier":"JaEdzanFl4M",
+      "identifier":"P78S_0ZOF6M",
       "exercise":"squat",
       "sex":"male",
       "local":"false",
       "parts":[
         {
         "name":"start",
-        "label":"false",
+        "label":"true",
         "view":"front",
         "startTime":"0",
-        "endTime":"3.87"
-        }          
+        "endTime":"2.94"
+        }   
       ]
     },
     {
-      "identifier":"BIIAVf30tqA",
+      "identifier":"Omp0VC34oZc",
       "exercise":"squat",
       "sex":"male",
       "local":"false",
       "parts":[
         {
         "name":"start",
-        "label":"false",
+        "label":"true",
         "view":"front",
         "startTime":"0",
-        "endTime":"3.52"
-        }         
+        "endTime":"2.85"
+        }  
+      ]
+    },
+    {
+      "identifier":"yTexka1YpFg",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+          "name":"start",
+          "label":"true",
+          "view":"front",
+          "startTime":"0",
+          "endTime":"4.04"
+        } 
+      ]
+    },
+    {
+      "identifier":"afWizCiX9TE",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+          "name":"start",
+          "label":"true",
+          "view":"front",
+          "startTime":"0",
+          "endTime":"4.45"
+        } 
       ]
     },
     {
@@ -88,96 +103,6 @@
         "view":"front",
         "startTime":"0",
         "endTime":"3.32"
-        }         
-      ]
-    },
-    {
-      "identifier":"-uYo6B4QRp0",
-      "exercise":"squat",
-      "sex":"male",
-      "local":"false",
-      "parts":[
-        {
-        "name":"start",
-        "label":"false",
-        "view":"front",
-        "startTime":"0",
-        "endTime":"2.99"
-        }         
-      ]
-    },
-    {
-      "identifier":"EUw534dPGGo",
-      "exercise":"squat",
-      "sex":"male",
-      "local":"false",
-      "parts":[
-        {
-        "name":"start",
-        "label":"false",
-        "view":"front",
-        "startTime":"0",
-        "endTime":"4.22"
-        }          
-      ]
-    },
-    {
-      "identifier":"FWF65fhdt7U",
-      "exercise":"squat",
-      "sex":"male",
-      "local":"false",
-      "parts":[
-        {
-        "name":"start",
-        "label":"false",
-        "view":"front",
-        "startTime":"0",
-        "endTime":"4.45"
-        }         
-      ]
-    },
-    {
-      "identifier":"fYuheZoJxzA",
-      "exercise":"squat",
-      "sex":"male",
-      "local":"false",
-      "parts":[
-        {
-        "name":"start",
-        "label":"false",
-        "view":"front",
-        "startTime":"0",
-        "endTime":"3.59"
-        }          
-      ]
-    },
-    {
-      "identifier":"MAl_SLxxeg0",
-      "exercise":"squat",
-      "sex":"male",
-      "local":"false",
-      "parts":[
-        {
-        "name":"start",
-        "label":"false",
-        "view":"front",
-        "startTime":"0",
-        "endTime":"2.92"
-        }         
-      ]
-    },
-    {
-      "identifier":"orJBq0nLH_Q",
-      "exercise":"squat",
-      "sex":"male",
-      "local":"false",
-      "parts":[
-        {
-        "name":"start",
-        "label":"false",
-        "view":"front",
-        "startTime":"0",
-        "endTime":"3.76"
         }         
       ]
     }

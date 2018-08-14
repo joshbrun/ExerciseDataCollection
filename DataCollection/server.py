@@ -7,6 +7,8 @@ import cgitb
 import uuid
 import re
 import time
+import boto3
+import sys
 
 from openpose.openPose import run_openpose_on_video
 from utilities.fileutilities import check_directory
@@ -27,9 +29,15 @@ except ImportError:
 import urllib
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
+
+import io
+import base64
+import cv2
+from imageio import imread
 
 
-TOKEN_EXPIRY = 160
+TOKEN_EXPIRY = 16000
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -94,17 +102,30 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(str.encode(message))
                 return
 
-            self.send_response(403)
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            # Send message back to client
-            status = '70'
+            status = 1.0
+            try:
+                # Send message back to client
+                global video_dict
+                expected_frames = (float(video_dict[token][1]) - float(video_dict[token][0])) * 30
+                check_directory("server/data/output/" + token + "/json")
+                processed_frames = os.listdir("../server/data/output/" + token + "/json")
+                status = 1.0 * len(processed_frames) / expected_frames
+                print(str(len(processed_frames)))
+                print(str(expected_frames))
+                print(str(status))
+            
+            except Exception as e:
+                pass
+
             message = json.dumps({'token': token, 'status': status})
             # Write content as utf-8 data
             self.wfile.write(str.encode(message))
             return
-
+        
     # POST
     def do_POST(self):
         """
@@ -115,6 +136,10 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         Note: this server is currently not able to handle more than 1 request at a time.
         :return:
         """
+        global token_dict
+        global video_dict
+
+        print("post")
 
         current_time = time.time()
 
@@ -126,50 +151,74 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         f = StringIO()
         fm = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
 
+        cv2_img = cv2.cvtColor(imread(io.BytesIO(base64.b64decode(fm.getvalue('file').split(',')[1]))), cv2.COLOR_RGB2BGR)
+        # do we want to save the image if so this is how we would
+        cv2.imwrite("image.jpg", cv2_img)
+        print("image")
+
         # Video at out.mp4
-        data_values = json.loads(fm.getvalue('data'))
-        token = data_values['token']
+        # data_values = json.loads(fm.getvalue('data'))
+        # print("asfd")
+        # token = data_values['token']
+        # start_time = data_values['startTime']
+        # end_time = data_values['finishTime']
 
-        if "file" in fm:
-            self.get_file_data(fm, token)
-        else:
-            print("ERROR")
-            Exception("BAD")
+        # if "file" in fm:
+        #     self.get_file_data(fm, token)
+        # else:
+        #     print("ERROR")
+        #     Exception("BAD")
 
-        try:
-            value = token_dict[token]
+        # try:
+        #     value = token_dict[token]
+        #     video_dict[token] = [start_time, end_time]
 
-        except Exception as e:
-            self.send_response(403)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            message = "Invalid token"
-            self.wfile.write(str.encode(message))
-            return
+        # except Exception as e:
+        #     self.send_response(403)
+        #     self.send_header('Content-type', 'text/html')
+        #     self.end_headers()
+        #     message = "Invalid token"
+        #     self.wfile.write(str.encode(message))
+        #     return
 
-        if (value['expiry'] <= current_time):
-            self.send_response(403)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            message = "Token has expired"
-            self.wfile.write(str.encode(message))
-            return
+        # if (value['expiry'] <= current_time):
+        #     self.send_response(403)
+        #     self.send_header('Content-type', 'text/html')
+        #     self.end_headers()
+        #     message = "Token has expired"
+        #     self.wfile.write(str.encode(message))
+        #     return
 
-        exercise = (data_values['exercise'])
-        view = (data_values['view'])
-        gender = (data_values['gender'])
-        start = (data_values['startTime'])
-        end = (data_values['finishTime'])
+        # exercise = (data_values['exercise'])
+        # view = (data_values['view'])
+        # gender = (data_values['gender'])
+        # start = (data_values['startTime'])
+        # end = (data_values['finishTime'])
 
-        # Run the computation pipeline, (Similar to the training pipeline)
-        self.process_pipeline(exercise, gender, view, token)
+        # # Run the computation pipeline, (Similar to the training pipeline)
+        # self.process_pipeline(exercise, gender, view, token)
+
+        # os.system("ffmpeg.exe -i server/data/output/"+token+"/video/"+token+".avi server/data/output/"+token+"/video/"+token+".mp4")
+
+        # AWS_ACCESS_KEY_ID = 'AKIAI2K6T3MJ24TCDFPA'
+        # AWS_SECRET_ACCESS_KEY = '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'
+
+        # bucket_name = 'p4p-videos'
+
+        # filename = 'server/data/output/'+token+"/video/"+token+".mp4"
+
+        # s3 = boto3.resource('s3')
+        # s3.Bucket(bucket_name).upload_file(filename, token)
+        # s3.ObjectAcl(bucket_name, token).put( ACL='public-read')
 
         # Return the response
         message = "Video was bad"
         self.send_response(200)
-        self.send_header("content-type", "application/html")
+        self.send_header("content-type", "octet/stream")
         self.end_headers()
-        self.wfile.write(bytes(message, "utf8"))
+
+        # with open('server/data/output/'+token+"/video/"+token+".mp4", 'rb') as f:
+        #     self.wfile.write(f.read())
 
     def process_pipeline(self, exercise, gender, view, id):
         """
@@ -230,6 +279,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             out.write(form['file'].file.read())
         return "server/data/input/" + id + ".mp4"
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+    pass
 
 def run():
     """
@@ -242,7 +294,7 @@ def run():
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access
     server_address = ('127.0.0.1', 8081)
-    httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
+    httpd = ThreadedHTTPServer(server_address, testHTTPServer_RequestHandler)
     print('Server is running.\n')
     httpd.serve_forever()
 
@@ -255,4 +307,5 @@ def add_token_to_dict(value, key):
 
 
 token_dict = {}
+video_dict = {}
 run()

@@ -151,9 +151,17 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         f = StringIO()
         fm = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
 
+        print(fm.getvalue('data'))
+        data_values = json.loads(fm.getvalue('data'))
+        token = data_values['token']
+        img_number = data_values['counter']
+
+        print(img_number)
+
         cv2_img = cv2.cvtColor(imread(io.BytesIO(base64.b64decode(fm.getvalue('file').split(',')[1]))), cv2.COLOR_RGB2BGR)
         # do we want to save the image if so this is how we would
-        cv2.imwrite("image.jpg", cv2_img)
+        cv2.imwrite(token + "_" + str(img_number) + ".jpg", cv2_img)
+        # cv2.imwrite("a.jpg", cv2_img)
         print("image")
 
         # Video at out.mp4

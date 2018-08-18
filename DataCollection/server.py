@@ -159,13 +159,13 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         try:
             value = token_dict[token]
-            video_dict[token] = [start_time, end_time]
 
         except Exception as e:
             self.send_response(403)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             message = "Invalid token"
+            print(message)
             self.wfile.write(str.encode(message))
             return
 
@@ -174,6 +174,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             message = "Token has expired"
+            print(message)
             self.wfile.write(str.encode(message))
             return
 
@@ -183,6 +184,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         # do we want to save the image if so this is how we would
         # cv2.imwrite(token + "_" + str(img_number) + ".jpg", cv2_img)
         results.append(img_number)
+
+
 
         # Return the response
         message = "Video was bad"

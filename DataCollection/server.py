@@ -10,7 +10,7 @@ import time
 import boto3
 import sys
 
-from openpose.openPose import run_openpose_on_video
+from openposeC.openPose import run_openpose_on_video
 from utilities.fileutilities import check_directory
 from jsonprocessing.processjson import process_json_for_server as process_json
 from jsonprocessing.sequenceprocessjson import process_json_for_server as process_sequencial_json
@@ -39,6 +39,7 @@ from imageio import imread
 
 TOKEN_EXPIRY = 16000
 results = []
+poses = []
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -186,7 +187,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         results.append(img_number)
 
 
-
         # Return the response
         message = "Video was bad"
         self.send_response(200)
@@ -194,64 +194,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(str.encode(','.join(str(e) for e in results)))
 
-    def process_pipeline(self, exercise, gender, view, id):
-        """
-        The process pipeline which takes the clients video,
-        Breaks it into frames
-        Runs openpose on all the frames
-        Processes the json output of openpose
-        Classify each json frame
-        analysis the results
-        return the results as a response to the client.
-        """
-
-        # Check the clients file exists
-
-        check_directory("server")
-        check_directory("server/data")
-        check_directory("server/data/input")
-        check_directory("server/data/output")
-
-        # Run the server, when py server.py is called
-        # run()
-        if os.path.isfile("server/data/input/" + id + ".mp4"):
-            # Extract the frames
-            # This is redundant currently, done directly by openpose
-
-            output_dir = "server/data/output"
-            # Run Open Pose on the frames
-            run_openpose_on_video(id, "../server/data/input/", "../" + output_dir, True)
-
-            # Create json Exercise file
-
-            parts = ['all']
-            with open('server/data/output/' + id + '/' + id + '.json', 'w') as outfile:
-                data = ["/server/" + exercise + "/" + gender + "/" + view + "/" + "all"]
-                json.dump(data, outfile)
-
-            # Process the skeletal data
-            process_json(os.path.join(output_dir, id), os.path.join(output_dir, id, "processedjson"), id)
-            process_sequencial_json(os.path.join(output_dir, id), os.path.join(output_dir, id, "processedjson"), id)
-            # Run Each frame against the model
-
-            # Analysis the results
-
-            # Form the response
-            pass
-
-    def get_file_data(self, form, id):
-        """
-        Gets the file data from the request.
-        this request form contains the name, gender, exercise and view of the request.
-        :param form: The data set within the request.
-        :return: The path to the request input video.
-        """
-        fn = form.getvalue((os.getcwd()), "server/data/input/" + id + ".mp4")
-        open(fn, 'w').close()
-
-        with open(fn, 'wb') as out:
-            out.write(form['file'].file.read())
-        return "server/data/input/" + id + ".mp4"
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""

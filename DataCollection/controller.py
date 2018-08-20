@@ -9,7 +9,7 @@ from videosplitter.videosplitter import split_videos
 from jsonprocessing.sortjsonfiles import sort_json_files
 # from jsonprocessing.processjson import process_json
 from jsonprocessing.sequenceprocessjson import process_json
-from openpose.openPose import run_openpose
+from openposeC.openPose import run_openpose
 
 from os.path import join
 from json import load

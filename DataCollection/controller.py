@@ -7,8 +7,8 @@ Controller for the pre-processing, and creation of the trainable data sets.
 from youtubedownloader.youtubedownloader import bulk_download_videos
 from videosplitter.videosplitter import split_videos
 from jsonprocessing.sortjsonfiles import sort_json_files
-# from jsonprocessing.processjson import process_json
-from jsonprocessing.sequenceprocessjson import process_json
+from jsonprocessing.processjson import process_json
+# from jsonprocessing.sequenceprocessjson import process_json
 from openpose.openPose import run_openpose
 
 from os.path import join

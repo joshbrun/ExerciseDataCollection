@@ -9,8 +9,12 @@ import re
 import time
 import boto3
 import sys
+from keras.models import load_model
+import tensorflow as tf
+import numpy as np
+from openPoseWrapper import OpenPoseWrapper
 
-from openpose.openPose import run_openpose_on_video
+from openposeC.openPose import run_openpose_on_video
 from utilities.fileutilities import check_directory
 from jsonprocessing.processjson import process_json_for_server as process_json
 from jsonprocessing.sequenceprocessjson import process_json_for_server as process_sequencial_json
@@ -31,8 +35,79 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 
+import io
+import base64
+import cv2
+from imageio import imread
+
 
 TOKEN_EXPIRY = 16000
+results = []
+poses = []
+
+model = load_model("./model.h5")
+graph = tf.get_default_graph()
+
+input = np.array([[[-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -0.0614079, 
+-0.27235401,  0.15142199, -0.272082,    0.36373401,  0.144284,   -0.110628,
+   0.31821501,  0.0642672,   0.328017,    0.26028499,  0.0280944,   0.216682,
+  -0.116723,    0.22742601, -0.25273499,  0.42913699, -0.24278,     0.64709699,
+   0.16345599,  0.21123999,  0.26026699,  0.43473101,  0.19226301,  0.66881502,
+  -0.261832,   -0.224621,   -0.175247,   -0.235912,   -0.27228299, -0.197428,
+  -0.0592719,  -0.241181,    0.163506,    0.73442101,  0.23108099,  0.72889203,
+   0.153905,    0.67973101, -0.262173,    0.72884703, -0.32982999,  0.71810198,
+  -0.19429,     0.65806001], 
+  [-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -0.0614079, 
+-0.27235401,  0.15142199, -0.272082,    0.36373401,  0.144284,   -0.110628,
+   0.31821501,  0.0642672,   0.328017,    0.26028499,  0.0280944,   0.216682,
+  -0.116723,    0.22742601, -0.25273499,  0.42913699, -0.24278,     0.64709699,
+   0.16345599,  0.21123999,  0.26026699,  0.43473101,  0.19226301,  0.66881502,
+  -0.261832,   -0.224621,   -0.175247,   -0.235912,   -0.27228299, -0.197428,
+  -0.0592719,  -0.241181,    0.163506,    0.73442101,  0.23108099,  0.72889203,
+   0.153905,    0.67973101, -0.262173,    0.72884703, -0.32982999,  0.71810198,
+  -0.19429,     0.65806001],
+  [-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -0.0614079, 
+-0.27235401,  0.15142199, -0.272082,    0.36373401,  0.144284,   -0.110628,
+   0.31821501,  0.0642672,   0.328017,    0.26028499,  0.0280944,   0.216682,
+  -0.116723,    0.22742601, -0.25273499,  0.42913699, -0.24278,     0.64709699,
+   0.16345599,  0.21123999,  0.26026699,  0.43473101,  0.19226301,  0.66881502,
+  -0.261832,   -0.224621,   -0.175247,   -0.235912,   -0.27228299, -0.197428,
+  -0.0592719,  -0.241181,    0.163506,    0.73442101,  0.23108099,  0.72889203,
+   0.153905,    0.67973101, -0.262173,    0.72884703, -0.32982999,  0.71810198,
+  -0.19429,     0.65806001],
+  [-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -0.0614079, 
+-0.27235401,  0.15142199, -0.272082,    0.36373401,  0.144284,   -0.110628,
+   0.31821501,  0.0642672,   0.328017,    0.26028499,  0.0280944,   0.216682,
+  -0.116723,    0.22742601, -0.25273499,  0.42913699, -0.24278,     0.64709699,
+   0.16345599,  0.21123999,  0.26026699,  0.43473101,  0.19226301,  0.66881502,
+  -0.261832,   -0.224621,   -0.175247,   -0.235912,   -0.27228299, -0.197428,
+  -0.0592719,  -0.241181,    0.163506,    0.73442101,  0.23108099,  0.72889203,
+   0.153905,    0.67973101, -0.262173,    0.72884703, -0.32982999,  0.71810198,
+  -0.19429,     0.65806001],
+  [-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -0.0614079, 
+-0.27235401,  0.15142199, -0.272082,    0.36373401,  0.144284,   -0.110628,
+   0.31821501,  0.0642672,   0.328017,    0.26028499,  0.0280944,   0.216682,
+  -0.116723,    0.22742601, -0.25273499,  0.42913699, -0.24278,     0.64709699,
+   0.16345599,  0.21123999,  0.26026699,  0.43473101,  0.19226301,  0.66881502,
+  -0.261832,   -0.224621,   -0.175247,   -0.235912,   -0.27228299, -0.197428,
+  -0.0592719,  -0.241181,    0.163506,    0.73442101,  0.23108099,  0.72889203,
+   0.153905,    0.67973101, -0.262173,    0.72884703, -0.32982999,  0.71810198,
+  -0.19429,     0.65806001],
+  [-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -0.0614079, 
+-0.27235401,  0.15142199, -0.272082,    0.36373401,  0.144284,   -0.110628,
+   0.31821501,  0.0642672,   0.328017,    0.26028499,  0.0280944,   0.216682,
+  -0.116723,    0.22742601, -0.25273499,  0.42913699, -0.24278,     0.64709699,
+   0.16345599,  0.21123999,  0.26026699,  0.43473101,  0.19226301,  0.66881502,
+  -0.261832,   -0.224621,   -0.175247,   -0.235912,   -0.27228299, -0.197428,
+  -0.0592719,  -0.241181,    0.163506,    0.73442101,  0.23108099,  0.72889203,
+   0.153905,    0.67973101, -0.262173,    0.72884703, -0.32982999,  0.71810198,
+  -0.19429,     0.65806001]]])
+
+# strangly romving this makes it stop working
+print(model.predict(input))
+
+op = OpenPoseWrapper()
+
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -120,7 +195,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             # Write content as utf-8 data
             self.wfile.write(str.encode(message))
             return
-
+        
     # POST
     def do_POST(self):
         """
@@ -134,6 +209,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         global token_dict
         global video_dict
 
+        print("post")
+
         current_time = time.time()
 
         # Check directorys all exist
@@ -144,27 +221,20 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         f = StringIO()
         fm = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
 
-        # Video at out.mp4
+        print(fm.getvalue('data'))
         data_values = json.loads(fm.getvalue('data'))
         token = data_values['token']
-        start_time = data_values['startTime']
-        end_time = data_values['finishTime']
-
-        if "file" in fm:
-            self.get_file_data(fm, token)
-        else:
-            print("ERROR")
-            Exception("BAD")
+        img_number = data_values['counter']
 
         try:
             value = token_dict[token]
-            video_dict[token] = [start_time, end_time]
 
         except Exception as e:
             self.send_response(403)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             message = "Invalid token"
+            print(message)
             self.wfile.write(str.encode(message))
             return
 
@@ -173,98 +243,35 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             message = "Token has expired"
+            print(message)
             self.wfile.write(str.encode(message))
             return
 
-        exercise = (data_values['exercise'])
-        view = (data_values['view'])
-        gender = (data_values['gender'])
-        start = (data_values['startTime'])
-        end = (data_values['finishTime'])
+        print(img_number)
 
-        # Run the computation pipeline, (Similar to the training pipeline)
-        self.process_pipeline(exercise, gender, view, token)
+        cv2_img = cv2.cvtColor(imread(io.BytesIO(base64.b64decode(fm.getvalue('file').split(',')[1]))), cv2.COLOR_RGB2BGR)
+        # do we want to save the image if so this is how we would
+        # cv2.imwrite(token + "_" + str(img_number) + ".jpg", cv2_img)
+        self.makePrediction(cv2_img)
 
-        os.system("ffmpeg.exe -i server/data/output/"+token+"/video/"+token+".avi server/data/output/"+token+"/video/"+token+".mp4")
-
-        AWS_ACCESS_KEY_ID = 'AKIAI2K6T3MJ24TCDFPA'
-        AWS_SECRET_ACCESS_KEY = '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'
-
-        bucket_name = 'p4p-videos'
-
-        filename = 'server/data/output/'+token+"/video/"+token+".mp4"
-
-        s3 = boto3.resource('s3')
-        s3.Bucket(bucket_name).upload_file(filename, token)
-        s3.ObjectAcl(bucket_name, token).put( ACL='public-read')
 
         # Return the response
         message = "Video was bad"
         self.send_response(200)
-        self.send_header("content-type", "octet/stream")
+        self.send_header('Content-type', 'text/html')
         self.end_headers()
+        self.wfile.write(str.encode(','.join(str(e) for e in results)))
+    
+    def makePrediction(self, img):
+        # print(model.predict(input))
+        poses.append(op.runOpenPoseOnImage(img))
+        if len(poses) >= 6:
+            a = [poses[len(poses) - 6:]]
+            na = np.array(a, dtype=np.float32)
+            # print(na)
+            predict = model.predict(na)
+            results.append(predict) 
 
-        with open('server/data/output/'+token+"/video/"+token+".mp4", 'rb') as f:
-            self.wfile.write(f.read())
-
-    def process_pipeline(self, exercise, gender, view, id):
-        """
-        The process pipeline which takes the clients video,
-        Breaks it into frames
-        Runs openpose on all the frames
-        Processes the json output of openpose
-        Classify each json frame
-        analysis the results
-        return the results as a response to the client.
-        """
-
-        # Check the clients file exists
-
-        check_directory("server")
-        check_directory("server/data")
-        check_directory("server/data/input")
-        check_directory("server/data/output")
-
-        # Run the server, when py server.py is called
-        # run()
-        if os.path.isfile("server/data/input/" + id + ".mp4"):
-            # Extract the frames
-            # This is redundant currently, done directly by openpose
-
-            output_dir = "server/data/output"
-            # Run Open Pose on the frames
-            run_openpose_on_video(id, "../server/data/input/", "../" + output_dir, True)
-
-            # Create json Exercise file
-
-            parts = ['all']
-            with open('server/data/output/' + id + '/' + id + '.json', 'w') as outfile:
-                data = ["/server/" + exercise + "/" + gender + "/" + view + "/" + "all"]
-                json.dump(data, outfile)
-
-            # Process the skeletal data
-            process_json(os.path.join(output_dir, id), os.path.join(output_dir, id, "processedjson"), id)
-            process_sequencial_json(os.path.join(output_dir, id), os.path.join(output_dir, id, "processedjson"), id)
-            # Run Each frame against the model
-
-            # Analysis the results
-
-            # Form the response
-            pass
-
-    def get_file_data(self, form, id):
-        """
-        Gets the file data from the request.
-        this request form contains the name, gender, exercise and view of the request.
-        :param form: The data set within the request.
-        :return: The path to the request input video.
-        """
-        fn = form.getvalue((os.getcwd()), "server/data/input/" + id + ".mp4")
-        open(fn, 'w').close()
-
-        with open(fn, 'wb') as out:
-            out.write(form['file'].file.read())
-        return "server/data/input/" + id + ".mp4"
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""

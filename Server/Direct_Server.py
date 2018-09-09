@@ -188,7 +188,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         # do we want to save the image if so this is how we would
         # cv2.imwrite(token + "_" + str(img_number) + ".jpg", cv2_img)
-        self.makePrediction(cv2_img)
+        result = self.makePrediction(cv2_img)
+        results.append(result)
 
         # Return the response
         message = "Video was bad"
@@ -207,6 +208,10 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             y_classes = result.argmax(axis=-1)
             print(y_classes)
             print(result)
+            if result[0][0] > result[0][1]:
+                return 0
+            else:
+                return 1
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

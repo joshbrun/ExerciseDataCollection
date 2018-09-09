@@ -11,11 +11,16 @@ import io
 import base64
 import cv2
 import json
+import sys
+import numpy as np
+
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from imageio import imread
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 from keras.models import load_model
+from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from DataCollection.utilities.fileutilities import check_directory
 
 cgitb.enable(format="text")
@@ -33,7 +38,10 @@ results = []
 poses = []
 
 model = load_model("./model.h5")
+global graph
 graph = tf.get_default_graph()
+# graph = tf.get_default_graph()
+# model.make_predict_function()
 
 
 # HTTPRequestHandler class
@@ -146,7 +154,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         fm = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
 
-        print(fm.getvalue('data'))
         data_values = json.loads(fm.getvalue('data'))
         token = data_values['token']
         img_number = data_values['counter']
@@ -173,9 +180,12 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             return
 
         print(img_number)
-        print(fm.getvalue('file'))
         cv2_img = cv2.cvtColor(imread(io.BytesIO(base64.b64decode(fm.getvalue('file').split(',')[1]))),
                                cv2.COLOR_RGB2BGR)
+        cv2_img = cv2.resize(cv2_img, (299, 299))
+        cv2_img = (cv2_img[...,::-1].astype(np.float32)) / 255.0
+
+
         # do we want to save the image if so this is how we would
         # cv2.imwrite(token + "_" + str(img_number) + ".jpg", cv2_img)
         self.makePrediction(cv2_img)
@@ -188,7 +198,15 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(str.encode(','.join(str(e) for e in results)))
 
     def makePrediction(self, img):
-        print(model.predict(img))
+        with graph.as_default():
+            print(img.shape)
+            x = img_to_array(img)  # this is a Numpy array with shape (3, 150, 150)
+            x = x.reshape((1,) + x.shape)
+            print(x.shape)
+            result = model.predict(x)
+            y_classes = result.argmax(axis=-1)
+            print(y_classes)
+            print(result)
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

@@ -99,11 +99,10 @@ def calculate_hcs(filename, label):
 
         # normalise around the right hip
         for i in range(0, len(key_points)):
-            a=3
-            # if i % 3 == 0:
-            #     key_points[i] -= right_hip_x
-            # if i % 3 == 1:
-            #     key_points[i] -= right_hip_y
+            if i % 3 == 0:
+                key_points[i] -= right_hip_x
+            if i % 3 == 1:
+                key_points[i] -= right_hip_y
         line = ",".join(map(str, key_points))
         line += "," + str(correctness)
 

@@ -25,7 +25,7 @@ def train(training_file, testing_file, epochs):
     # create classifier that will be used
     classifier = tf.estimator.DNNClassifier(
         feature_columns=feature_columns,                # The input features to our model
-        hidden_units=[50, 25, 10],              # Two layers, each with 10 neurons
+        hidden_units=[50, 50],              # Two layers, each with 10 neurons
         n_classes=2,                                    # Number of classes, currently good or bad
         optimizer=tf.train.AdamOptimizer(1e-4),         # Use Adam optimiser with default setting
         # optimizer=tf.train.ProximalAdagradOptimizer(

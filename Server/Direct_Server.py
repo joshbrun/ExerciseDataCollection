@@ -189,14 +189,14 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         # do we want to save the image if so this is how we would
         # cv2.imwrite(token + "_" + str(img_number) + ".jpg", cv2_img)
         result = self.makePrediction(cv2_img)
-        results.append(result)
+        # results.append(result)
 
         # Return the response
         message = "Video was bad"
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write(str.encode(','.join(str(e) for e in results)))
+        self.wfile.write(str.encode(result))
 
     def makePrediction(self, img):
         with graph.as_default():

@@ -124,6 +124,35 @@ def calculate_hcs(filename, label):
 
     return line
 
+def calculate_std(filename, label):
+    """
+    :param filename:
+    :param label:
+    :return:
+    """
+    # print("Calculating Gradients for filename: "+filename+", label: "+label);
+    correctness = 0
+    if label == "true":
+        correctness = 1
+    elif label == "server":
+        correctness = '?'
+
+    line = ""
+    file = open(filename, 'r')
+    lines = file.readline()
+    people = json.loads(lines)['people']
+
+    if len(people) > 0:
+        # If there are more than one person in the frame only use the first.
+        key_points = people[0]['pose_keypoints_2d']
+
+        line = ",".join(map(str, key_points))
+        line += "," + str(correctness)
+
+        file.close()
+
+    return line
+
 def calculate_gradients_coarse(filename, label):
     """
     :param filename:
@@ -218,11 +247,12 @@ def process_json(input_dir, output_dir):
         set_name_list = data_set.split("/")
 
         output_file_name = set_name_list[1] + "_" + set_name_list[2] + "_" + set_name_list[3] + "_" + set_name_list[4]
-        output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
-        hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
         agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
         output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
+        gradient_output_agg_file = open(output_dir + "/gradient_" + agg_output_file_name + ".csv", "a")
         hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
+        mirrored_output_agg_file = open(output_dir + "/mirrored_" + agg_output_file_name + ".csv", "a")
+        mirrored_hcs_output_agg_file = open(output_dir + "/" + "mirrored_hcs_" + agg_output_file_name + ".csv", "a")
 
         for label in ['true', 'false']:
             set_dir = json_dir + "/" + label + "/" + data_set
@@ -230,28 +260,40 @@ def process_json(input_dir, output_dir):
                 files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
                 files.sort()
                 lines = []
+                std_lines = []
                 hcs_lines = []
                 for json_file in files:
-                    print(json_file)
                     lines.append(calculate_gradients_coarse(set_dir + "/" + json_file, label))
                     hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
-
-                for line in lines:
-                    if not (line == ""):
-                        output_file.write(line + "\n")
-                        output_agg_file.write(line + "\n")
+                    std_lines.append(calculate_std(set_dir + "/" + json_file, label))
                 
-                for line in hcs_lines:
+                for line in lines:
+                    if not line == "":
+                        gradient_output_agg_file.write(line + "\n")
+
+                for line in std_lines:
+                    if not line == "":
+                        output_agg_file.write(line + "\n")
                     for ex_line in expand_set(line):
                         if not (ex_line == ""):
-                            hcs_output_file.write(ex_line + "\n")
-                            hcs_output_agg_file.write(ex_line + "\n")
+                            mirrored_output_agg_file.write(ex_line + "\n")
+
+                for line in hcs_lines:
+                    if not line == "":
+                        hcs_output_agg_file.write(line + "\n")
+                    for ex_line in expand_set(line):
+                        if not (ex_line == ""):
+                            mirrored_hcs_output_agg_file.write(ex_line + "\n")
 
             except FileNotFoundError as e:
                 print(e)
                 continue
 
-        output_file.close()
+        output_agg_file.close()
+        gradient_output_agg_file.close()
+        hcs_output_agg_file.close()
+        mirrored_output_agg_file.close()
+        mirrored_hcs_output_agg_file.close()
     print("Sets Processed")
 
 def process_json_for_server(input_dir, output_dir, id):

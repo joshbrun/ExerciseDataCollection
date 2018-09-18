@@ -71,6 +71,20 @@ JOINTS_CHEST = [6, 7]
 # Head
 JOINTS_HEAD = [2, 3, 16, 17]
 
+# Reflection mapping
+REFLECTION_POINTS = [
+    (17, 18),
+    (15, 16),
+    (2, 5),
+    (3, 6),
+    (4, 7),
+    (9, 12),
+    (10, 13),
+    (11, 14),
+    (22, 19),
+    (23, 20),
+    (24, 21)
+]
 
 def calculate_hcs(filename, label):
     """
@@ -272,6 +286,8 @@ def process_json_for_server(input_dir, output_dir, id):
         agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
         output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
         hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
+        mirrored_output_agg_file = open(output_dir + "/mirrored_" + agg_output_file_name + ".csv", "a")
+        mirrored_hcs_output_agg_file = open(output_dir + "/" + "mirrored_hcs_" + agg_output_file_name + ".csv", "a")
 
         for label in ['server']:
             set_dir = json_dir +'/json'
@@ -285,15 +301,20 @@ def process_json_for_server(input_dir, output_dir, id):
                 hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
 
             for line in lines:
-                if not (line == ""):
-                    # output_file.write(line + "\n")
+                if not line == "":
                     output_agg_file.write(line + "\n")
+                for ex_line in expand_set(line):
+                    if not (ex_line == ""):
+                        # output_file.write(line + "\n")
+                        mirrored_output_agg_file.write(ex_line + "\n")
 
             for line in hcs_lines:
+                if not line == "":
+                    hcs_output_agg_file.write(line + "\n")
                 for ex_line in expand_set(line):
                     if not (ex_line == ""):
                         # hcs_output_file.write(ex_line + "\n")
-                        hcs_output_agg_file.write(ex_line + "\n")
+                        mirrored_hcs_output_agg_file.write(ex_line + "\n")
 
 
 
@@ -301,22 +322,25 @@ def process_json_for_server(input_dir, output_dir, id):
     print("Sets Processed")
 
 def expand_set(line):
-    return [line]
-    # line = line.split(",")
-    # lines = []
-    # lines.append(line)
-    # lines.append(mirror(line))
-    # # new_lines = []
-    # # for l in lines:
-    # #     new_lines.append(scale(l, 0.8))
-    # #     new_lines.append(scale(l, 1.2))
-    # # lines += new_lines
-    # final_lines = []
+    # return [line]
+    line = line.split(",")
+    lines = []
+    lines.append(line)
+    lines.append(mirror(line))
+    # new_lines = []
     # for l in lines:
-    #     final_lines.append(",".join(map(str, l)))
-    # return final_lines
+    #     new_lines.append(scale(l, 0.8))
+    #     new_lines.append(scale(l, 1.2))
+    # lines += new_lines
+    final_lines = []
+    for l in lines:
+        final_lines.append(",".join(map(str, l)))
+    return final_lines
 
 def mirror(line):
+    reversed_points = scale(line, -1)
+    for swap_points in REFLECTION_POINTS:
+        reversed_points[swap_points[0] * 3], reversed_points[swap_points[1] * 3] = reversed_points[swap_points[1] * 3], reversed_points[swap_points[0] * 3]
     return scale(line, -1)
 
 def scale(line, scale_factor):

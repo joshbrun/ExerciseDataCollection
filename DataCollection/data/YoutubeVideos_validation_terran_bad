@@ -1,0 +1,35 @@
+{
+  "Videos":
+  [
+    {
+      "identifier":"-EWiPh9qecE",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+        "name":"start",
+        "label":"false",
+        "view":"front",
+        "startTime":"0",
+        "endTime":"2.0"
+        }          
+      ]
+    },
+    {
+      "identifier":"JiOrT7o6Rhw",
+      "exercise":"squat",
+      "sex":"male",
+      "local":"false",
+      "parts":[
+        {
+        "name":"start",
+        "label":"false",
+        "view":"front",
+        "startTime":"1.0",
+        "endTime":"4.0"
+        }          
+      ]
+    }
+  ]
+}

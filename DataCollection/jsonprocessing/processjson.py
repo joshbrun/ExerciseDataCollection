@@ -267,8 +267,8 @@ def process_json_for_server(input_dir, output_dir, id):
     for data_set in sets:
         set_name_list = data_set.split("/")
         output_file_name = set_name_list[1] + "_" + set_name_list[2] + "_" + set_name_list[3] + "_" + set_name_list[4]
-        output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
-        hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
+        # output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
+        # hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
         agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
         output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
         hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
@@ -286,13 +286,13 @@ def process_json_for_server(input_dir, output_dir, id):
 
             for line in lines:
                 if not (line == ""):
-                    output_file.write(line + "\n")
+                    # output_file.write(line + "\n")
                     output_agg_file.write(line + "\n")
 
             for line in hcs_lines:
                 for ex_line in expand_set(line):
                     if not (ex_line == ""):
-                        hcs_output_file.write(ex_line + "\n")
+                        # hcs_output_file.write(ex_line + "\n")
                         hcs_output_agg_file.write(ex_line + "\n")
 
 

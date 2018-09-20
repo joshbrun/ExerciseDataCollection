@@ -9,12 +9,13 @@ PATH = os.getcwd()
 PATH_DATASET = PATH
 FILE_TRAIN = PATH_DATASET + os.sep + "data/output_training/hcs_squat_front.csv"
 FILE_TEST = PATH_DATASET + os.sep + "data/output_validation/hcs_squat_front.csv" 
+FILE_TEST_NEW = PATH_DATASET + os.sep + "data/output_testing/hcs_squat_front.csv" 
 
 
 def train(training_file, testing_file, epochs):
     next_batch = get_dataset(training_file, True)       # Will return 32 random elements
 
-    feature_names = [str(i) for i in range(50)]
+    feature_names = [str(i) for i in range(75)]
     feature_columns = [tf.feature_column.numeric_column(k) for k in feature_names]
 
     my_checkpointing_config = tf.estimator.RunConfig(
@@ -35,8 +36,9 @@ def train(training_file, testing_file, epochs):
     classifier.train(input_fn=lambda: get_dataset(training_file, True, epochs))
 
     # evaluate model
-    evaluate_result = classifier.evaluate(input_fn=lambda: get_dataset(testing_file, False, 4), name="Seen_Test")
-    evaluate_result = classifier.evaluate(input_fn=lambda: get_dataset(testing_file_new_people, False, 4), name="New_People")
+    evaluate_result = classifier.evaluate(input_fn=lambda: get_dataset(training_file, False, 1), name="Train_set")
+    evaluate_result = classifier.evaluate(input_fn=lambda: get_dataset(testing_file, False, 1), name="Seen_Test")
+    evaluate_result = classifier.evaluate(input_fn=lambda: get_dataset(FILE_TEST_NEW, False, 1), name="New_People")
 
     # print("Evaluation results")
     # for key in evaluate_result:
@@ -57,13 +59,13 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     def decode_csv(line):
-        feature_names = [str(i) for i in range(50)]#17)]
+        feature_names = [str(i) for i in range(75)]#17)]
         decoder = [[0.]] * 75
         decoder.append([0])
         parsed_line = tf.decode_csv(line, decoder)
         label = parsed_line[-1]     			# Last element is the label
         del parsed_line[-1]         			# Delete last element
-        parsed_line = [parsed_line[i] for i in range(75) if i % 3 != 0]
+        # parsed_line = [parsed_line[i] for i in range(75) if i % 3 != 0]
         features = parsed_line      			# Everything but last elements are the features
         d = dict(zip(feature_names, features)), label
         return d

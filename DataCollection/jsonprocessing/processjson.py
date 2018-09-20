@@ -274,16 +274,16 @@ def process_json(input_dir, output_dir):
                 for line in std_lines:
                     if not line == "":
                         output_agg_file.write(line + "\n")
-                    for ex_line in expand_set(line):
-                        if not (ex_line == ""):
-                            mirrored_output_agg_file.write(ex_line + "\n")
+                        for ex_line in expand_set(line):
+                            if not (ex_line == ""):
+                                mirrored_output_agg_file.write(ex_line + "\n")
 
                 for line in hcs_lines:
                     if not line == "":
                         hcs_output_agg_file.write(line + "\n")
-                    for ex_line in expand_set(line):
-                        if not (ex_line == ""):
-                            mirrored_hcs_output_agg_file.write(ex_line + "\n")
+                        for ex_line in expand_set(line):
+                            if not (ex_line == ""):
+                                mirrored_hcs_output_agg_file.write(ex_line + "\n")
 
             except FileNotFoundError as e:
                 print(e)
@@ -345,18 +345,18 @@ def process_json_for_server(input_dir, output_dir, id):
             for line in lines:
                 if not line == "":
                     output_agg_file.write(line + "\n")
-                for ex_line in expand_set(line):
-                    if not (ex_line == ""):
-                        # output_file.write(line + "\n")
-                        mirrored_output_agg_file.write(ex_line + "\n")
+                    for ex_line in expand_set(line):
+                        if not (ex_line == ""):
+                            # output_file.write(line + "\n")
+                            mirrored_output_agg_file.write(ex_line + "\n")
 
             for line in hcs_lines:
                 if not line == "":
                     hcs_output_agg_file.write(line + "\n")
-                for ex_line in expand_set(line):
-                    if not (ex_line == ""):
-                        # hcs_output_file.write(ex_line + "\n")
-                        mirrored_hcs_output_agg_file.write(ex_line + "\n")
+                    for ex_line in expand_set(line):
+                        if not (ex_line == ""):
+                            # hcs_output_file.write(ex_line + "\n")
+                            mirrored_hcs_output_agg_file.write(ex_line + "\n")
 
 
 

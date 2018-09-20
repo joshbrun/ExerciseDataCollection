@@ -253,6 +253,8 @@ def process_json(input_dir, output_dir):
         hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
         mirrored_output_agg_file = open(output_dir + "/mirrored_" + agg_output_file_name + ".csv", "a")
         mirrored_hcs_output_agg_file = open(output_dir + "/" + "mirrored_hcs_" + agg_output_file_name + ".csv", "a")
+        scaled_output_agg_file = open(output_dir + "/" + "scaled_" + agg_output_file_name + ".csv", "a")
+        scaled_hcs_output_agg_file = open(output_dir + "/" + "scaled_hcs_" + agg_output_file_name + ".csv", "a")
 
         for label in ['true', 'false']:
             set_dir = json_dir + "/" + label + "/" + data_set
@@ -273,6 +275,9 @@ def process_json(input_dir, output_dir):
 
                 for line in std_lines:
                     if not line == "":
+                        scaled = normalise([float(x) for x in line.split(',')], 0, 75)
+                        scaled = normalise(scaled, 1, 75)
+                        scaled_output_agg_file.write(",".join(map(str, scaled)) + "\n")
                         output_agg_file.write(line + "\n")
                         for ex_line in expand_set(line):
                             if not (ex_line == ""):
@@ -280,6 +285,9 @@ def process_json(input_dir, output_dir):
 
                 for line in hcs_lines:
                     if not line == "":
+                        scaled = normalise([float(x) for x in line.split(',')], 0, 75)
+                        scaled = normalise(scaled, 1, 75)
+                        scaled_hcs_output_agg_file.write(",".join(map(str, scaled)) + "\n")
                         hcs_output_agg_file.write(line + "\n")
                         for ex_line in expand_set(line):
                             if not (ex_line == ""):
@@ -389,3 +397,23 @@ def scale(line, scale_factor):
     line_copy = line.copy()
     line_copy = [line[i] if i % 3 == 2 or i + 1 == len(line) else scale_factor * float(line[i]) for i in range(len(line))]
     return line_copy
+
+def normalise(data, index, length, skip=3):
+    max_x = -10
+    min_x = 10
+    min_ind = -1
+    for y in range(index, length, skip):
+        val = data[y]
+        if val > max_x:
+            max_x = val
+        elif val < min_x:
+            min_x = val
+            min_ind = y
+
+    factor = 2 / (max_x + abs(min_x))
+    shift = -1 - data[min_ind] * factor
+
+    for y in range(index, length, skip):
+        data[y] = data[y] * factor + shift
+    
+    return data

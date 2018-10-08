@@ -2,20 +2,21 @@ import os
 import tensorflow as tf
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
 
 PATH = os.getcwd()
 
 # Fetch and store Training and Test dataset files
 PATH_DATASET = PATH
-FILE_TRAIN = PATH_DATASET + os.sep + "data/output_training/hcs_squat_front.csv"
-FILE_TEST = PATH_DATASET + os.sep + "data/output_validation/hcs_squat_front.csv" 
-FILE_TEST_NEW = PATH_DATASET + os.sep + "data/output_testing/hcs_squat_front.csv" 
+FILE_TRAIN = PATH_DATASET + os.sep + "data/output_training/scaled_hcs_squat_front.csv"
+FILE_TEST = PATH_DATASET + os.sep + "data/output_validation/scaled_hcs_squat_front.csv" 
+FILE_TEST_NEW = PATH_DATASET + os.sep + "data/output_testing/scaled_hcs_squat_front.csv" 
 
 
 def train(training_file, testing_file, epochs):
     next_batch = get_dataset(training_file, True)       # Will return 32 random elements
 
-    feature_names = [str(i) for i in range(75)]
+    feature_names = [str(i) for i in range(50)]
     feature_columns = [tf.feature_column.numeric_column(k) for k in feature_names]
 
     my_checkpointing_config = tf.estimator.RunConfig(
@@ -26,10 +27,10 @@ def train(training_file, testing_file, epochs):
     # create classifier that will be used
     classifier = tf.estimator.DNNClassifier(
         feature_columns=feature_columns,                # The input features to our model
-        hidden_units=[50, 50],              		# Two layers, each with 10 neurons
+        hidden_units=[50, 25],              		# Two layers, each with 10 neurons
         n_classes=2,                                    # Number of classes, currently good or bad
         optimizer=tf.train.AdamOptimizer(1e-4),         # Use Adam optimiser with default setting
-        dropout=0.1,                                    # Add dropout to reduce overfitting
+        dropout=0.4,                                    # Add dropout to reduce overfitting
         config=my_checkpointing_config,			# Save checkpoints every 60s
         model_dir=os.getcwd()+"/modeloutput/")          # Path to where checkpoints etc are stored
 
@@ -59,13 +60,13 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     def decode_csv(line):
-        feature_names = [str(i) for i in range(75)]#17)]
+        feature_names = [str(i) for i in range(50)]#17)]
         decoder = [[0.]] * 75
         decoder.append([0])
         parsed_line = tf.decode_csv(line, decoder)
         label = parsed_line[-1]     			# Last element is the label
         del parsed_line[-1]         			# Delete last element
-        # parsed_line = [parsed_line[i] for i in range(75) if i % 3 != 0]
+        parsed_line = [parsed_line[i] for i in range(75) if i % 3 != 0]
         features = parsed_line      			# Everything but last elements are the features
         d = dict(zip(feature_names, features)), label
         return d
@@ -80,5 +81,5 @@ def get_dataset(file_path, perform_shuffle=False, repeat_count=1):
     batch_features, batch_labels = iterator.get_next()
     return batch_features, batch_labels
 
-for i in range (20):
+for i in range (50):
     train(FILE_TRAIN, FILE_TEST, 50)

@@ -277,6 +277,7 @@ def process_json(input_dir, output_dir):
                     if not line == "":
                         scaled = normalise([float(x) for x in line.split(',')], 0, 75)
                         scaled = normalise(scaled, 1, 75)
+                        scaled[-1] = int(scaled[-1])
                         scaled_output_agg_file.write(",".join(map(str, scaled)) + "\n")
                         output_agg_file.write(line + "\n")
                         for ex_line in expand_set(line):
@@ -287,6 +288,7 @@ def process_json(input_dir, output_dir):
                     if not line == "":
                         scaled = normalise([float(x) for x in line.split(',')], 0, 75)
                         scaled = normalise(scaled, 1, 75)
+                        scaled[-1] = int(scaled[-1])
                         scaled_hcs_output_agg_file.write(",".join(map(str, scaled)) + "\n")
                         hcs_output_agg_file.write(line + "\n")
                         for ex_line in expand_set(line):

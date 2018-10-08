@@ -28,7 +28,7 @@ def get_model():
     model.add(Dense(units=10, activation='relu', input_dim=50))
     model.add(Dense(units=5, activation='relu', input_dim=50))
     model.add(Dense(2, activation='relu'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
     return model
 
 

@@ -10,7 +10,7 @@ import sys
 import os
 
 sys.path.append(join(getcwd(), "utilities"))
-from utilities.fileutilities import check_directory
+from DataCollection.utilities.fileutilities import check_directory
 
 
 def split_videos(videos, input_dir, output_dir):

@@ -9,7 +9,7 @@ from os.path import isfile, join
 import sys
 
 sys.path.append(join(getcwd(), "utilities"))
-from utilities.fileutilities import check_directory
+from DataCollection.utilities.fileutilities import check_directory
 
 
 def sort_json_files(input_dir):

@@ -3,7 +3,7 @@ from DataCollection.youtubedownloader.youtubedownloader import download_video, b
 import unittest
 import os
 
-class TestYouTubeDownloade(unittest.TestCase):
+class TestYouTubeDownloader(unittest.TestCase):
 
     def test_download_video(self):
         key = 'Omp0VC34oZc'

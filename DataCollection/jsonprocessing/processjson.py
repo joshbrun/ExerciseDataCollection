@@ -71,6 +71,20 @@ JOINTS_CHEST = [6, 7]
 # Head
 JOINTS_HEAD = [2, 3, 16, 17]
 
+# Reflection mapping
+REFLECTION_POINTS = [
+    (17, 18),
+    (15, 16),
+    (2, 5),
+    (3, 6),
+    (4, 7),
+    (9, 12),
+    (10, 13),
+    (11, 14),
+    (22, 19),
+    (23, 20),
+    (24, 21)
+]
 
 def calculate_hcs(filename, label):
     """
@@ -103,6 +117,35 @@ def calculate_hcs(filename, label):
                 key_points[i] -= right_hip_x
             if i % 3 == 1:
                 key_points[i] -= right_hip_y
+        line = ",".join(map(str, key_points))
+        line += "," + str(correctness)
+
+        file.close()
+
+    return line
+
+def calculate_std(filename, label):
+    """
+    :param filename:
+    :param label:
+    :return:
+    """
+    # print("Calculating Gradients for filename: "+filename+", label: "+label);
+    correctness = 0
+    if label == "true":
+        correctness = 1
+    elif label == "server":
+        correctness = '?'
+
+    line = ""
+    file = open(filename, 'r')
+    lines = file.readline()
+    people = json.loads(lines)['people']
+
+    if len(people) > 0:
+        # If there are more than one person in the frame only use the first.
+        key_points = people[0]['pose_keypoints_2d']
+
         line = ",".join(map(str, key_points))
         line += "," + str(correctness)
 
@@ -204,11 +247,14 @@ def process_json(input_dir, output_dir):
         set_name_list = data_set.split("/")
 
         output_file_name = set_name_list[1] + "_" + set_name_list[2] + "_" + set_name_list[3] + "_" + set_name_list[4]
-        output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
-        hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
         agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
         output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
+        gradient_output_agg_file = open(output_dir + "/gradient_" + agg_output_file_name + ".csv", "a")
         hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
+        mirrored_output_agg_file = open(output_dir + "/mirrored_" + agg_output_file_name + ".csv", "a")
+        mirrored_hcs_output_agg_file = open(output_dir + "/" + "mirrored_hcs_" + agg_output_file_name + ".csv", "a")
+        scaled_output_agg_file = open(output_dir + "/" + "scaled_" + agg_output_file_name + ".csv", "a")
+        scaled_hcs_output_agg_file = open(output_dir + "/" + "scaled_hcs_" + agg_output_file_name + ".csv", "a")
 
         for label in ['true', 'false']:
             set_dir = json_dir + "/" + label + "/" + data_set
@@ -216,28 +262,48 @@ def process_json(input_dir, output_dir):
                 files = [f for f in listdir(set_dir) if isfile(join(set_dir, f))]
                 files.sort()
                 lines = []
+                std_lines = []
                 hcs_lines = []
                 for json_file in files:
-                    print(json_file)
                     lines.append(calculate_gradients_coarse(set_dir + "/" + json_file, label))
                     hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
-
-                for line in lines:
-                    if not (line == ""):
-                        output_file.write(line + "\n")
-                        output_agg_file.write(line + "\n")
+                    std_lines.append(calculate_std(set_dir + "/" + json_file, label))
                 
+                for line in lines:
+                    if not line == "":
+                        gradient_output_agg_file.write(line + "\n")
+
+                for line in std_lines:
+                    if not line == "":
+                        scaled = normalise([float(x) for x in line.split(',')], 0, 75)
+                        scaled = normalise(scaled, 1, 75)
+                        scaled[-1] = int(scaled[-1])
+                        scaled_output_agg_file.write(",".join(map(str, scaled)) + "\n")
+                        output_agg_file.write(line + "\n")
+                        for ex_line in expand_set(line):
+                            if not (ex_line == ""):
+                                mirrored_output_agg_file.write(ex_line + "\n")
+
                 for line in hcs_lines:
-                    for ex_line in expand_set(line):
-                        if not (ex_line == ""):
-                            hcs_output_file.write(ex_line + "\n")
-                            hcs_output_agg_file.write(ex_line + "\n")
+                    if not line == "":
+                        scaled = normalise([float(x) for x in line.split(',')], 0, 75)
+                        scaled = normalise(scaled, 1, 75)
+                        scaled[-1] = int(scaled[-1])
+                        scaled_hcs_output_agg_file.write(",".join(map(str, scaled)) + "\n")
+                        hcs_output_agg_file.write(line + "\n")
+                        for ex_line in expand_set(line):
+                            if not (ex_line == ""):
+                                mirrored_hcs_output_agg_file.write(ex_line + "\n")
 
             except FileNotFoundError as e:
                 print(e)
                 continue
 
-        output_file.close()
+        output_agg_file.close()
+        gradient_output_agg_file.close()
+        hcs_output_agg_file.close()
+        mirrored_output_agg_file.close()
+        mirrored_hcs_output_agg_file.close()
     print("Sets Processed")
 
 def process_json_for_server(input_dir, output_dir, id):
@@ -267,11 +333,13 @@ def process_json_for_server(input_dir, output_dir, id):
     for data_set in sets:
         set_name_list = data_set.split("/")
         output_file_name = set_name_list[1] + "_" + set_name_list[2] + "_" + set_name_list[3] + "_" + set_name_list[4]
-        output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
-        hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
+        # output_file = open(output_dir + "/" + output_file_name + ".csv", "w+")
+        # hcs_output_file = open(output_dir + "/" + "hcs_" + output_file_name + ".csv", "w+")
         agg_output_file_name = set_name_list[1] + "_" + set_name_list[3]
         output_agg_file = open(output_dir + "/" + agg_output_file_name + ".csv", "a")
         hcs_output_agg_file = open(output_dir + "/" + "hcs_" + agg_output_file_name + ".csv", "a")
+        mirrored_output_agg_file = open(output_dir + "/mirrored_" + agg_output_file_name + ".csv", "a")
+        mirrored_hcs_output_agg_file = open(output_dir + "/" + "mirrored_hcs_" + agg_output_file_name + ".csv", "a")
 
         for label in ['server']:
             set_dir = json_dir +'/json'
@@ -285,15 +353,20 @@ def process_json_for_server(input_dir, output_dir, id):
                 hcs_lines.append(calculate_hcs(set_dir + "/" + json_file, label))
 
             for line in lines:
-                if not (line == ""):
-                    output_file.write(line + "\n")
+                if not line == "":
                     output_agg_file.write(line + "\n")
+                    for ex_line in expand_set(line):
+                        if not (ex_line == ""):
+                            # output_file.write(line + "\n")
+                            mirrored_output_agg_file.write(ex_line + "\n")
 
             for line in hcs_lines:
-                for ex_line in expand_set(line):
-                    if not (ex_line == ""):
-                        hcs_output_file.write(ex_line + "\n")
-                        hcs_output_agg_file.write(ex_line + "\n")
+                if not line == "":
+                    hcs_output_agg_file.write(line + "\n")
+                    for ex_line in expand_set(line):
+                        if not (ex_line == ""):
+                            # hcs_output_file.write(ex_line + "\n")
+                            mirrored_hcs_output_agg_file.write(ex_line + "\n")
 
 
 
@@ -301,25 +374,48 @@ def process_json_for_server(input_dir, output_dir, id):
     print("Sets Processed")
 
 def expand_set(line):
-    return [line]
-    # line = line.split(",")
-    # lines = []
-    # lines.append(line)
-    # lines.append(mirror(line))
-    # # new_lines = []
-    # # for l in lines:
-    # #     new_lines.append(scale(l, 0.8))
-    # #     new_lines.append(scale(l, 1.2))
-    # # lines += new_lines
-    # final_lines = []
+    # return [line]
+    line = line.split(",")
+    lines = []
+    lines.append(line)
+    lines.append(mirror(line))
+    # new_lines = []
     # for l in lines:
-    #     final_lines.append(",".join(map(str, l)))
-    # return final_lines
+    #     new_lines.append(scale(l, 0.8))
+    #     new_lines.append(scale(l, 1.2))
+    # lines += new_lines
+    final_lines = []
+    for l in lines:
+        final_lines.append(",".join(map(str, l)))
+    return final_lines
 
 def mirror(line):
+    reversed_points = scale(line, -1)
+    for swap_points in REFLECTION_POINTS:
+        reversed_points[swap_points[0] * 3], reversed_points[swap_points[1] * 3] = reversed_points[swap_points[1] * 3], reversed_points[swap_points[0] * 3]
     return scale(line, -1)
 
 def scale(line, scale_factor):
     line_copy = line.copy()
     line_copy = [line[i] if i % 3 == 2 or i + 1 == len(line) else scale_factor * float(line[i]) for i in range(len(line))]
     return line_copy
+
+def normalise(data, index, length, skip=3):
+    max_x = -10
+    min_x = 10
+    min_ind = -1
+    for y in range(index, length, skip):
+        val = data[y]
+        if val > max_x:
+            max_x = val
+        elif val < min_x:
+            min_x = val
+            min_ind = y
+
+    factor = 2 / (max_x + abs(min_x))
+    shift = -1 - data[min_ind] * factor
+
+    for y in range(index, length, skip):
+        data[y] = data[y] * factor + shift
+    
+    return data

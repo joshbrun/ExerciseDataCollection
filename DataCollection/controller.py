@@ -9,8 +9,8 @@ from videosplitter.videosplitter import split_videos
 from jsonprocessing.sortjsonfiles import sort_json_files
 from jsonprocessing.processjson import process_json
 # from jsonprocessing.sequenceprocessjson import process_json
-from openpose.openPose import run_openpose
-# from openposeC.openPose import run_openpose
+# from openpose.openPose import run_openpose
+from openposeC.openPose import run_openpose
 
 from os.path import join
 from json import load
@@ -20,11 +20,12 @@ DATA_DIR = "data"
 VIDEO_FILE = "YoutubeVideos"
 TRAINING_MODIFIER = "_training"
 VALIDATION_MODIFIER = "_validation"
+TESTING_MODIFIER = "_testing"
 VIDEO_DIR = "videos"
 FRAMES_DIR = "frames"
 JSON_DIR = "json"
 OUTPUT_DIR = "output"
-MODIFIERS = [TRAINING_MODIFIER, VALIDATION_MODIFIER]
+MODIFIERS = [TRAINING_MODIFIER, VALIDATION_MODIFIER, TESTING_MODIFIER]
 
 for modifier in MODIFIERS:
     # Paths

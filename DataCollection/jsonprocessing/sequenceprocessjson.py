@@ -11,7 +11,7 @@ from os.path import join, isfile
 import sys
 
 sys.path.append(join(getcwd(), "utilities"))
-from utilities.fileutilities import check_directory
+from DataCollection.utilities.fileutilities import check_directory
 
 
 def calculate_hcs(filename, label):

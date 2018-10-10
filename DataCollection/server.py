@@ -12,12 +12,12 @@ import sys
 from keras.models import load_model
 import tensorflow as tf
 import numpy as np
-from openPoseWrapper import OpenPoseWrapper
+# from openPoseWrapper import OpenPoseWrapper
 
-from openposeC.openPose import run_openpose_on_video
-from utilities.fileutilities import check_directory
-from jsonprocessing.processjson import process_json_for_server as process_json
-from jsonprocessing.sequenceprocessjson import process_json_for_server as process_sequencial_json
+# from openposeC.openPose import run_openpose_on_video
+from DataCollection.utilities.fileutilities import check_directory
+from DataCollection.jsonprocessing.processjson import process_json_for_server as process_json
+from DataCollection.jsonprocessing.sequenceprocessjson import process_json_for_server as process_sequencial_json
 
 cgitb.enable(format="text")
 from wsgiref.util import FileWrapper
@@ -45,8 +45,8 @@ TOKEN_EXPIRY = 16000
 results = []
 poses = []
 
-model = load_model("./model.h5")
-graph = tf.get_default_graph()
+# model = load_model("./model.h5")
+# graph = tf.get_default_graph()
 
 input = np.array([[[-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -0.0614079, 
 -0.27235401,  0.15142199, -0.272082,    0.36373401,  0.144284,   -0.110628,
@@ -104,9 +104,9 @@ input = np.array([[[-0.194611, -0.197695, -0.0496206, -0.0940232, -0.27184501, -
   -0.19429,     0.65806001]]])
 
 # strangly romving this makes it stop working
-print(model.predict(input))
+# print(model.predict(input))
 
-op = OpenPoseWrapper()
+# op = OpenPoseWrapper()
 
 
 # HTTPRequestHandler class
@@ -298,8 +298,8 @@ def add_token_to_dict(value, key):
     print('\nAdding token to dict')
     print(token_dict)
     token_dict[key] = {'expiry': value, 'status': 0}
-
+    return token_dict
 
 token_dict = {}
 video_dict = {}
-run()
+# run()
